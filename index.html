@@ -257,70 +257,55 @@
         </div>
     </div>
 
+ <!-- PANTALLA 4: CÁMARA Y ESCANEO MÓVIL -->
     <div id="screen-4" class="screen">
-    <div class="clearfix">
-        <button class="btn-back" onclick="goToScreen('screen-3')">← Cancelar</button>
-        <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
-    </div>
-    
-    <!-- Contenedor del visor de cámara -->
-   <div class="camera-container" style="position: relative; width: 100%; height: 60vh; background-color: #000; border: 2px solid var(--border-color); border-radius: 12px; margin: 1rem 0; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-    
-    <!-- ETIQUETA DE VIDEO REAL -->
-    <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;"></video>
-    
-    <!-- Overlay de estado -->
-    <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 2; border: 1px solid var(--text-muted);">
-        🔴 Esperando posición...
-    </div>
-
-    <!-- Botón Flotante de Grabación -->
-    <button id="btn-record-action" class="btn-primary" style="display: none; position: absolute; bottom: 20px; z-index: 10; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        EMPEZAR
-    </button>
-</div>
+        <div class="clearfix">
+            <!-- CORRECCIÓN: Se añadió stopCamera() al botón Cancelar -->
+            <button class="btn-back" onclick="goToScreen('screen-3'); stopCamera();">← Cancelar</button>
+            <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
+        </div>
         
-        <!-- Overlay de estado -->
-        <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 2; border: 1px solid var(--text-muted);">
-            🔴 Esperando posición...
+        <!-- Contenedor del visor de cámara -->
+        <div class="camera-container" style="position: relative; width: 100%; height: 60vh; background-color: #000; border: 2px solid var(--border-color); border-radius: 12px; margin: 1rem 0; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+            
+            <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;"></video>
+            
+            <!-- CORRECCIÓN: Elementos únicos de Overlay y Botón Empezar -->
+            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 2; border: 1px solid var(--text-muted);">
+                🔴 Esperando posición...
+            </div>
+
+            <button id="btn-record-action" class="btn-primary" style="display: none; position: absolute; bottom: 20px; z-index: 10; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                EMPEZAR
+            </button>
         </div>
 
-        <!-- Botón Flotante de Grabación (Oculto inicialmente) -->
-        <button id="btn-record-action" class="btn-primary" style="display: none; position: absolute; bottom: 20px; z-index: 10; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-            EMPEZAR
-        </button>
-    </div>
+        <!-- Contenedor de Controles Inferiores -->
+        <div id="bottom-controls" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
+            <button id="btn-hold-scan" class="btn-primary" style="width: 100%; height: 80px; font-size: 1.1rem; user-select: none; touch-action: manipulation; transition: all 0.1s ease;">
+                MANTENER PARA FIJAR NODOS
+            </button>
 
-    <!-- Contenedor de Controles Inferiores -->
-    <div id="bottom-controls" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
-        
-        <!-- Botón de Fijación (Hold) -->
-        <button id="btn-hold-scan" class="btn-primary" style="width: 100%; height: 80px; font-size: 1.1rem; user-select: none; touch-action: manipulation; transition: all 0.1s ease;">
-            MANTENER PARA FIJAR NODOS
-        </button>
-
-        <!-- Botones de Decisión Final (Ocultos inicialmente) -->
-        <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between;">
-            <button id="btn-repeat" class="btn-back" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REPETIR</button>
-            <button id="btn-evaluate" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">CALIFICAR</button>
+            <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between;">
+                <button id="btn-repeat" class="btn-back" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REPETIR</button>
+                <button id="btn-evaluate" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">CALIFICAR</button>
+            </div>
         </div>
-
     </div>
-</div>
 
     <script>
-        // Control de navegación entre pantallas
-      const holdBtn = document.getElementById('btn-hold-scan');
-    const recordBtn = document.getElementById('btn-record-action');
-    const decisionDiv = document.getElementById('decision-buttons');
-    const statusOverlay = document.getElementById('status-overlay');
-    const repeatBtn = document.getElementById('btn-repeat');
-    const evaluateBtn = document.getElementById('btn-evaluate');
-    
-    let scanTimeout;
-    let isNodesLocked = false;
-    let isRecording = false;
+        // Variables UI
+        const holdBtn = document.getElementById('btn-hold-scan');
+        const recordBtn = document.getElementById('btn-record-action');
+        const decisionDiv = document.getElementById('decision-buttons');
+        const statusOverlay = document.getElementById('status-overlay');
+        const repeatBtn = document.getElementById('btn-repeat');
+        const evaluateBtn = document.getElementById('btn-evaluate');
         
+        let scanTimeout;
+        let isNodesLocked = false;
+        let isRecording = false;
+            
         function goToScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
@@ -328,7 +313,6 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        // Manejo de la selección de arte marcial
         function selectMartialArt(art) {
             if (art === 'taekwondo') {
                 goToScreen('screen-3');
@@ -338,118 +322,109 @@
             }
         }
 
+        // Configuración de la cámara
         const videoElement = document.getElementById('webcam');
-let cameraStream = null;
+        let cameraStream = null;
 
-async function startCamera() {
-    try {
-        // Pide acceso a la cámara trasera por defecto en móviles
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' } 
-        });
-        videoElement.srcObject = cameraStream;
-    } catch (error) {
-        console.error("Error al acceder a la cámara: ", error);
-        alert("Por favor, permite el acceso a la cámara en tu navegador.");
-    }
-}
-
-function stopCamera() {
-    if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-    }
-}
-
-        // Selección del Poomsae específico (Aquí conectaremos la Base de Datos Experta y el Pipeline)
-function selectPoomsae(poomsaeName) {
-    document.getElementById('current-poomsae-label').innerText = poomsaeName;
-    goToScreen('screen-4');
-    startCamera(); // ¡Enciende la cámara al entrar!
-}
-
-        function startScanning(e) {
-        if (isNodesLocked) return;
-        e.preventDefault();
-        holdBtn.style.backgroundColor = '#cc5500';
-        statusOverlay.innerHTML = '⚡ FIJANDO NODOS...';
-        statusOverlay.style.color = 'var(--accent-orange)';
-
-        // Simula el tiempo que tarda MediaPipe en asegurar los 33 puntos
-        scanTimeout = setTimeout(() => {
-            isNodesLocked = true;
-            statusOverlay.innerHTML = '🎯 NODOS FIJADOS. LISTO.';
-            statusOverlay.style.background = 'rgba(255, 107, 0, 0.2)';
-            
-            // Ocultar botón de hold y mostrar botón de EMPEZAR en la cámara
-            holdBtn.style.display = 'none';
-            recordBtn.style.display = 'block';
-            recordBtn.innerText = 'EMPEZAR';
-            recordBtn.style.backgroundColor = 'var(--accent-orange)';
-        }, 1200); // 1.2 segundos de confirmación
-    }
-
-    function stopScanning(e) {
-        if (isNodesLocked) return;
-        e.preventDefault();
-        holdBtn.style.backgroundColor = 'var(--accent-orange)';
-        clearTimeout(scanTimeout);
-        statusOverlay.innerHTML = '🔴 Esperando posición...';
-        statusOverlay.style.color = '#fff';
-    }
-
-    // 2. Lógica del Botón EMPEZAR / TERMINAR
-    recordBtn.addEventListener('click', () => {
-        if (!isRecording) {
-            // Acción: EMPEZAR GRABACIÓN
-            isRecording = true;
-            statusOverlay.innerHTML = '⏺️ GRABANDO POOMSAE...';
-            statusOverlay.style.background = 'rgba(255, 0, 0, 0.3)';
-            statusOverlay.style.borderColor = 'red';
-            statusOverlay.style.color = 'white';
-            
-            recordBtn.innerText = 'TERMINAR';
-            recordBtn.style.backgroundColor = '#d32f2f'; // Rojo para indicar que grabamos
-        } else {
-            // Acción: TERMINAR GRABACIÓN
-            isRecording = false;
-            statusOverlay.innerHTML = '✅ GRABACIÓN COMPLETADA';
-            statusOverlay.style.background = 'rgba(0, 255, 0, 0.2)';
-            statusOverlay.style.borderColor = 'green';
-            
-            // Ocultar botón flotante y mostrar controles de decisión
-            recordBtn.style.display = 'none';
-            decisionDiv.style.display = 'flex';
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' } 
+                });
+                videoElement.srcObject = cameraStream;
+            } catch (error) {
+                console.error("Error al acceder a la cámara: ", error);
+                alert("Por favor, permite el acceso a la cámara en tu navegador.");
+            }
         }
-    });
 
-    // 3. Lógica del Botón REPETIR
-    repeatBtn.addEventListener('click', () => {
-        // Resetear estado
-        isNodesLocked = false;
-        isRecording = false;
-        
-        decisionDiv.style.display = 'none';
-        holdBtn.style.display = 'block';
-        
-        statusOverlay.innerHTML = '🔴 Esperando posición...';
-        statusOverlay.style.background = 'rgba(0,0,0,0.6)';
-        statusOverlay.style.borderColor = 'var(--text-muted)';
-    });
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+        }
 
-    // 4. Lógica del Botón CALIFICAR
-    evaluateBtn.addEventListener('click', () => {
-        statusOverlay.innerHTML = '🧠 ENVIANDO A IA...';
-        // Aquí se dispara el envío de datos JSON a Gemini y Firebase
-        alert('Procesando datos del Poomsae con Gemini... (Llevando a pantalla de resultados)');
-    });
+        // Selección del Poomsae
+        function selectPoomsae(poomsaeName) {
+            document.getElementById('current-poomsae-label').innerText = poomsaeName;
+            goToScreen('screen-4');
+            startCamera(); 
+        }
 
-    // Listeners Touch y Mouse para el botón de fijar
-    holdBtn.addEventListener('touchstart', startScanning);
-    holdBtn.addEventListener('touchend', stopScanning);
-    holdBtn.addEventListener('mousedown', startScanning);
-    holdBtn.addEventListener('mouseup', stopScanning);
-    holdBtn.addEventListener('mouseleave', stopScanning);
-        
+        // Lógica de Escaneo y Botones
+        function startScanning(e) {
+            if (isNodesLocked) return;
+            e.preventDefault();
+            holdBtn.style.backgroundColor = '#cc5500';
+            statusOverlay.innerHTML = '⚡ FIJANDO NODOS...';
+            statusOverlay.style.color = 'var(--accent-orange)';
+
+            scanTimeout = setTimeout(() => {
+                isNodesLocked = true;
+                statusOverlay.innerHTML = '🎯 NODOS FIJADOS. LISTO.';
+                statusOverlay.style.background = 'rgba(255, 107, 0, 0.2)';
+                
+                holdBtn.style.display = 'none';
+                recordBtn.style.display = 'block';
+                recordBtn.innerText = 'EMPEZAR';
+                recordBtn.style.backgroundColor = 'var(--accent-orange)';
+            }, 1200); 
+        }
+
+        function stopScanning(e) {
+            if (isNodesLocked) return;
+            e.preventDefault();
+            holdBtn.style.backgroundColor = 'var(--accent-orange)';
+            clearTimeout(scanTimeout);
+            statusOverlay.innerHTML = '🔴 Esperando posición...';
+            statusOverlay.style.color = '#fff';
+        }
+
+        recordBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                isRecording = true;
+                statusOverlay.innerHTML = '⏺️ GRABANDO POOMSAE...';
+                statusOverlay.style.background = 'rgba(255, 0, 0, 0.3)';
+                statusOverlay.style.borderColor = 'red';
+                statusOverlay.style.color = 'white';
+                
+                recordBtn.innerText = 'TERMINAR';
+                recordBtn.style.backgroundColor = '#d32f2f'; 
+            } else {
+                isRecording = false;
+                statusOverlay.innerHTML = '✅ GRABACIÓN COMPLETADA';
+                statusOverlay.style.background = 'rgba(0, 255, 0, 0.2)';
+                statusOverlay.style.borderColor = 'green';
+                
+                recordBtn.style.display = 'none';
+                decisionDiv.style.display = 'flex';
+            }
+        });
+
+        repeatBtn.addEventListener('click', () => {
+            isNodesLocked = false;
+            isRecording = false;
+            
+            decisionDiv.style.display = 'none';
+            holdBtn.style.display = 'block';
+            
+            statusOverlay.innerHTML = '🔴 Esperando posición...';
+            statusOverlay.style.background = 'rgba(0,0,0,0.6)';
+            statusOverlay.style.borderColor = 'var(--text-muted)';
+        });
+
+        evaluateBtn.addEventListener('click', () => {
+            statusOverlay.innerHTML = '🧠 ENVIANDO A IA...';
+            alert('Procesando datos del Poomsae con Gemini...');
+        });
+
+        holdBtn.addEventListener('touchstart', startScanning);
+        holdBtn.addEventListener('touchend', stopScanning);
+        holdBtn.addEventListener('mousedown', startScanning);
+        holdBtn.addEventListener('mouseup', stopScanning);
+        holdBtn.addEventListener('mouseleave', stopScanning);
     </script>
 </body>
 </html>
+  
