@@ -327,11 +327,10 @@
         }
 
         // Selección del Poomsae específico (Aquí conectaremos la Base de Datos Experta y el Pipeline)
-        function selectPoomsae(poomsaeName) {
-            console.log("Poomsae seleccionado para activar base de datos experta:", poomsaeName);
-            // Próximo paso: Abrir la pantalla de cámara/grabación y cargar el perfil de IA especialista de este Poomsae
-            alert(`Cargando base de datos experta y pipeline de IA para: ${poomsaeName}. ¡Preparando cámara!`);
-        }
+ function selectPoomsae(poomsaeName) {
+    document.getElementById('current-poomsae-label').innerText = poomsaeName;
+    goToScreen('screen-4');
+}
 
         function startScanning(e) {
         if (isNodesLocked) return;
