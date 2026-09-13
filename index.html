@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dojokan - Evaluador de Poomsae por IA</title>
+    
+    <!-- Librerías de Google MediaPipe (Visión, Control, Dibujo y Pose) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
     <style>
         :root {
             --bg-color: #0a0a0a;
@@ -50,7 +57,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Títulos y Logos */
         .logo-title {
             font-size: 3rem;
             font-weight: 800;
@@ -71,7 +77,6 @@
             letter-spacing: 1px;
         }
 
-        /* Botones Base */
         .btn-primary {
             background-color: var(--accent-orange);
             color: var(--text-main);
@@ -93,7 +98,6 @@
             box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
         }
 
-        /* Grillas de Opciones */
         .grid-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -132,7 +136,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Grilla específica para Poomsaes (6 opciones) */
         .grid-poomsae {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -166,7 +169,6 @@
             font-weight: 600;
         }
 
-        /* Botón de Regreso */
         .btn-back {
             background: transparent;
             border: 1px solid var(--border-color);
@@ -250,17 +252,16 @@
                 <span>Poomsae 8</span>
                 <h4>Pal Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Koryo')|">
+            <div class="card-poomsae" onclick="selectPoomsae('Koryo')">
                 <span>Cinta Negra</span>
                 <h4>Koryo</h4>
             </div>
         </div>
     </div>
 
- <!-- PANTALLA 4: CÁMARA Y ESCANEO MÓVIL -->
+    <!-- PANTALLA 4: CÁMARA Y ESCANEO MÓVIL -->
     <div id="screen-4" class="screen">
         <div class="clearfix">
-            <!-- CORRECCIÓN: Se añadió stopCamera() al botón Cancelar -->
             <button class="btn-back" onclick="goToScreen('screen-3'); stopCamera();">← Cancelar</button>
             <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
         </div>
@@ -270,8 +271,10 @@
             
             <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;"></video>
             
-            <!-- CORRECCIÓN: Elementos únicos de Overlay y Botón Empezar -->
-            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 2; border: 1px solid var(--text-muted);">
+            <!-- Lienzo donde MediaPipe dibuja el esqueleto -->
+            <canvas id="output_canvas" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 2; pointer-events: none;"></canvas>
+            
+            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 3; border: 1px solid var(--text-muted);">
                 🔴 Esperando posición...
             </div>
 
@@ -322,37 +325,93 @@
             }
         }
 
-        // Configuración de la cámara
+        // ==========================================
+        // INTEGRACIÓN MEDIAPIPE Y CÁMARA
+        // ==========================================
         const videoElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        
         let cameraStream = null;
+        let isPipelineActive = false;
 
+        // 1. Inicializar el motor Pose de MediaPipe
+        const pose = new Pose({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }});
+
+        pose.setOptions({
+            modelComplexity: 1, // Balance entre velocidad móvil y precisión
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        // 2. Dibujar resultados en pantalla
+        pose.onResults((results) => {
+            if(videoElement.videoWidth && videoElement.videoHeight) {
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+            }
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            if (results.poseLandmarks) {
+                // Conectores (Líneas Naranjas)
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 4});
+                // Nodos (Puntos Blancos)
+                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffffff', lineWidth: 2});
+            }
+            canvasCtx.restore();
+        });
+
+        // 3. Bucle continuo de fotogramas
+        async function detectionLoop() {
+            if (!isPipelineActive) return;
+            if (videoElement.readyState >= 2) {
+                await pose.send({image: videoElement});
+            }
+            requestAnimationFrame(detectionLoop);
+        }
+
+        // 4. Encendido del sistema
         async function startCamera() {
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' } 
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
                 });
                 videoElement.srcObject = cameraStream;
+                
+                videoElement.onloadedmetadata = () => {
+                    isPipelineActive = true;
+                    detectionLoop();
+                };
             } catch (error) {
                 console.error("Error al acceder a la cámara: ", error);
                 alert("Por favor, permite el acceso a la cámara en tu navegador.");
             }
         }
 
+        // 5. Apagado del sistema
         function stopCamera() {
+            isPipelineActive = false;
             if (cameraStream) {
                 cameraStream.getTracks().forEach(track => track.stop());
                 videoElement.srcObject = null;
             }
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         }
 
-        // Selección del Poomsae
+        // ==========================================
+        // FLUJO DE INTERFAZ Y BOTONES
+        // ==========================================
         function selectPoomsae(poomsaeName) {
             document.getElementById('current-poomsae-label').innerText = poomsaeName;
             goToScreen('screen-4');
             startCamera(); 
         }
 
-        // Lógica de Escaneo y Botones
         function startScanning(e) {
             if (isNodesLocked) return;
             e.preventDefault();
@@ -427,4 +486,3 @@
     </script>
 </body>
 </html>
-  
