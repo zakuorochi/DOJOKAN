@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dojokan - Evaluador de Poomsae por IA</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: #161616;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-orange: #ff6b00;
+            --accent-orange-hover: #ff8533;
+            --border-color: #262626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            text-align: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Títulos y Logos */
+        .logo-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .logo-title span {
+            color: var(--accent-orange);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Botones Base */
+        .btn-primary {
+            background-color: var(--accent-orange);
+            color: var(--text-main);
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
+        }
+
+        /* Grillas de Opciones */
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card-option {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-option:hover {
+            border-color: var(--accent-orange);
+            transform: translateY(-4px);
+            background-color: #1f1f1f;
+        }
+
+        .card-option h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .card-option p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Grilla específica para Poomsaes (6 opciones) */
+        .grid-poomsae {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .card-poomsae {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-poomsae:hover {
+            border-color: var(--accent-orange);
+            background-color: rgba(255, 107, 0, 0.05);
+        }
+
+        .card-poomsae h4 {
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .card-poomsae span {
+            font-size: 0.8rem;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Botón de Regreso */
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            float: left;
+        }
+
+        .btn-back:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA 1: INICIO -->
+    <div id="screen-1" class="screen active">
+        <h1 class="logo-title">Dojo<span>kan</span></h1>
+        <p class="subtitle">Sistema Inteligente de Evaluación de Formas</p>
+        <button class="btn-primary" onclick="goToScreen('screen-2')">Ingresar al Sistema</button>
+    </div>
+
+    <!-- PANTALLA 2: SELECCIÓN DE ARTE MARCIAL -->
+    <div id="screen-2" class="screen">
+        <div class="clearfix">
+            <button class="btn-back" onclick="goToScreen('screen-1')">← Volver</button>
+        </div>
+        <h1 class="logo-title" style="font-size: 2.2rem;">Selecciona tu Disciplina</h1>
+        <p class="subtitle">Escoge el arte marcial a evaluar</p>
+        
+        <div class="grid-options">
+            <div class="card-option" onclick="selectMartialArt('karate')">
+                <h3>Karate-Do</h3>
+                <p>Kata oficiales (WKF)</p>
+            </div>
+            <div class="card-option" onclick="selectMartialArt('taekwondo')">
+                <h3>Taekwondo</h3>
+                <p>Poomsae oficiales (WT)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: SELECCIÓN DE POOMSAES (TAEKWONDO) -->
+    <div id="screen-3" class="screen">
+        <div class="clearfix">
+            <button class="btn-back" onclick="goToScreen('screen-2')">← Volver</button>
+        </div>
+        <h1 class="logo-title" style="font-size: 2.2rem;">Taekwondo <span>Poomsae</span></h1>
+        <p class="subtitle">Selecciona la forma a ejecutar (Base de datos experta individual)</p>
+        
+        <div class="grid-poomsae">
+            <div class="card-poomsae" onclick="selectPoomsae('Sa Jang')">
+                <span>Poomsae 4</span>
+                <h4>Sa Jang</h4>
+            </div>
+            <div class="card-poomsae" onclick="selectPoomsae('Oh Jang')">
+                <span>Poomsae 5</span>
+                <h4>Oh Jang</h4>
+            </div>
+            <div class="card-poomsae" onclick="selectPoomsae('Yuk Jang')">
+                <span>Poomsae 6</span>
+                <h4>Yuk Jang</h4>
+            </div>
+            <div class="card-poomsae" onclick="selectPoomsae('Chil Jang')">
+                <span>Poomsae 7</span>
+                <h4>Chil Jang</h4>
+            </div>
+            <div class="card-poomsae" onclick="selectPoomsae('Pal Jang')">
+                <span>Poomsae 8</span>
+                <h4>Pal Jang</h4>
+            </div>
+            <div class="card-poomsae" onclick="selectPoomsae('Koryo')|">
+                <span>Cinta Negra</span>
+                <h4>Koryo</h4>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Control de navegación entre pantallas
+        function goToScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Manejo de la selección de arte marcial
+        function selectMartialArt(art) {
+            if (art === 'taekwondo') {
+                goToScreen('screen-3');
+            } else {
+                alert('El módulo de Karate estará disponible próximamente. Ingresando a Taekwondo.');
+                goToScreen('screen-3');
+            }
+        }
+
+        // Selección del Poomsae específico (Aquí conectaremos la Base de Datos Experta y el Pipeline)
+        function selectPoomsae(poomsaeName) {
+            console.log("Poomsae seleccionado para activar base de datos experta:", poomsaeName);
+            // Próximo paso: Abrir la pantalla de cámara/grabación y cargar el perfil de IA especialista de este Poomsae
+            alert(`Cargando base de datos experta y pipeline de IA para: ${poomsaeName}. ¡Preparando cámara!`);
+        }
+    </script>
+</body>
+</html>
