@@ -236,7 +236,7 @@
                 <span>Poomsae 4</span>
                 <h4>Sa Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Oh Jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Oh Jang', 'oh_jang')">
                 <span>Poomsae 5</span>
                 <h4>Oh Jang</h4>
             </div>
@@ -308,6 +308,7 @@
         let scanTimeout;
         let isNodesLocked = false;
         let isRecording = false;
+        let activePoomsaeFile = 'oh_jang'; // ID por defecto
             
         function goToScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -335,19 +336,17 @@
         let cameraStream = null;
         let isPipelineActive = false;
 
-        // 1. Inicializar el motor Pose de MediaPipe
         const pose = new Pose({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
         }});
 
         pose.setOptions({
-            modelComplexity: 1, // Balance entre velocidad móvil y precisión
+            modelComplexity: 1, 
             smoothLandmarks: true,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
 
-        // 2. Dibujar resultados en pantalla
         pose.onResults((results) => {
             if(videoElement.videoWidth && videoElement.videoHeight) {
                 canvasElement.width = videoElement.videoWidth;
@@ -358,15 +357,12 @@
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
             
             if (results.poseLandmarks) {
-                // Conectores (Líneas Naranjas)
                 drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 4});
-                // Nodos (Puntos Blancos)
                 drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffffff', lineWidth: 2});
             }
             canvasCtx.restore();
         });
 
-        // 3. Bucle continuo de fotogramas
         async function detectionLoop() {
             if (!isPipelineActive) return;
             if (videoElement.readyState >= 2) {
@@ -375,7 +371,6 @@
             requestAnimationFrame(detectionLoop);
         }
 
-        // 4. Encendido del sistema
         async function startCamera() {
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({
@@ -393,7 +388,6 @@
             }
         }
 
-        // 5. Apagado del sistema
         function stopCamera() {
             isPipelineActive = false;
             if (cameraStream) {
@@ -406,8 +400,9 @@
         // ==========================================
         // FLUJO DE INTERFAZ Y BOTONES
         // ==========================================
-        function selectPoomsae(poomsaeName) {
+        function selectPoomsae(poomsaeName, fileId = 'oh_jang') {
             document.getElementById('current-poomsae-label').innerText = poomsaeName;
+            activePoomsaeFile = fileId; 
             goToScreen('screen-4');
             startCamera(); 
         }
@@ -473,9 +468,56 @@
             statusOverlay.style.borderColor = 'var(--text-muted)';
         });
 
-        evaluateBtn.addEventListener('click', () => {
+        // ==========================================
+        // CONEXIÓN CON VERCEL API Y RUNWARE
+        // ==========================================
+        evaluateBtn.addEventListener('click', async () => {
             statusOverlay.innerHTML = '🧠 ENVIANDO A IA...';
-            alert('Procesando datos del Poomsae con Gemini...');
+            statusOverlay.style.background = 'rgba(0, 0, 255, 0.4)';
+            
+            try {
+                // 1. Leer el JSON estático local (Asegúrate de que la carpeta "datos/taekwondo/" y el archivo existan)
+                const respuestaMatriz = await fetch(`./datos/taekwondo/${activePoomsaeFile}.json`);
+                if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
+                const matrizPerfecta = await respuestaMatriz.json();
+                
+                // 2. Simulación de los datos del alumno (Aquí irán las coordenadas recopiladas en grabación)
+                const datosGrabados = { duracion: 42, pasos_registrados: [] }; 
+            
+                // 3. Enviar paquete al endpoint de Vercel
+                const respuestaApi = await fetch('/api/jurado', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        disciplina: 'taekwondo',
+                        matrizPerfecta: matrizPerfecta,
+                        datosAlumno: datosGrabados
+                    })
+                });
+
+                if (!respuestaApi.ok) {
+                    throw new Error('El servidor respondió con un error.');
+                }
+
+                // 4. Mostrar Resultados
+                const calificacion = await respuestaApi.json();
+                
+                let textoObservaciones = "Ninguna";
+                if (calificacion.observaciones && calificacion.observaciones.length > 0) {
+                    textoObservaciones = calificacion.observaciones[0].detalle;
+                }
+                
+                alert(`Puntaje Final: ${calificacion.puntaje_final}\n\nObservación principal: ${textoObservaciones}`);
+                
+                statusOverlay.innerHTML = '✅ EVALUACIÓN FINALIZADA';
+                statusOverlay.style.background = 'rgba(0, 255, 0, 0.4)';
+
+            } catch (error) {
+                console.error(error);
+                alert('Hubo un error al contactar al servidor. Verifica que /api/jurado esté desplegado y el JSON exista.');
+                statusOverlay.innerHTML = '❌ ERROR DE CONEXIÓN';
+                statusOverlay.style.background = 'rgba(255, 0, 0, 0.6)';
+            }
         });
 
         holdBtn.addEventListener('touchstart', startScanning);
