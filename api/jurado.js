@@ -1,5 +1,4 @@
 // api/jurado.js
-import crypto from 'node:crypto';
 
 export default async function handler(req, res) {
     // Permitir CORS básico por seguridad
@@ -18,10 +17,11 @@ export default async function handler(req, res) {
     try {
         const { matrizPerfecta, datosAlumno, disciplina } = req.body || {};
         
-        const RUNWARE_API_KEY = process.env.RUNWARE_API_KEY;
+        // Volvemos a usar la variable de entorno de Google
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-        if (!RUNWARE_API_KEY) {
-            console.error("Falta la variable de entorno RUNWARE_API_KEY");
+        if (!GEMINI_API_KEY) {
+            console.error("Falta la variable de entorno GEMINI_API_KEY");
             return res.status(500).json({ error: 'Configuración de servidor incompleta (API Key ausente).' });
         }
 
@@ -36,59 +36,59 @@ export default async function handler(req, res) {
         Compara ambos datos y devuelve la evaluación estricta.
         `;
 
-        const respuestaRunware = await fetch('https://api.runware.ai/v1', {
+        // Endpoint oficial de Google Gemini (usamos 1.5-flash por su alta velocidad de respuesta)
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+
+        const respuestaGemini = await fetch(url, {
             method: "POST",
             headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${RUNWARE_API_KEY}`
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify([
-                {
-                    taskType: "textInference",
-                    taskUUID: crypto.randomUUID(),
-                    model: "google:gemini@3.1-flash-lite",
-                    outputFormat: "JSON",
-                    jsonSchema: {
-                        type: "object",
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: promptJurado }]
+                }],
+                // Obligamos a Gemini a devolver un JSON con esta estructura exacta
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
                         properties: {
-                            puntaje_final: { type: "number" },
+                            puntaje_final: { type: "NUMBER" },
                             observaciones: {
-                                type: "array",
+                                type: "ARRAY",
                                 items: {
-                                    type: "object",
+                                    type: "OBJECT",
                                     properties: {
-                                        paso: { type: "integer" },
-                                        detalle: { type: "string" }
+                                        paso: { type: "INTEGER" },
+                                        detalle: { type: "STRING" }
                                     },
                                     required: ["paso", "detalle"]
                                 }
                             }
                         },
                         required: ["puntaje_final", "observaciones"]
-                    },
-                    messages: [
-                        {
-                            role: "user",
-                            content: promptJurado
-                        }
-                    ]
+                    }
                 }
-            ])
+            })
         });
 
-        const resultado = await respuestaRunware.json();
+        const resultado = await respuestaGemini.json();
 
-        if (resultado.errors) {
-            console.error("Error devuelto por Runware:", JSON.stringify(resultado.errors));
-            return res.status(500).json({ error: 'Fallo en el motor de IA de Runware', detalles: resultado.errors });
+        // Control de errores nativos de la API de Google
+        if (resultado.error) {
+            console.error("Error devuelto por Gemini:", JSON.stringify(resultado.error));
+            return res.status(500).json({ error: 'Fallo en el motor de IA de Google', detalles: resultado.error.message });
         }
 
-        if (!resultado.data || !resultado.data[0] || !resultado.data[0].text) {
-            console.error("Respuesta inesperada de Runware:", JSON.stringify(resultado));
+        // Validación de que la respuesta tenga el formato esperado
+        if (!resultado.candidates || !resultado.candidates[0] || !resultado.candidates[0].content) {
+            console.error("Respuesta inesperada de Gemini:", JSON.stringify(resultado));
             return res.status(500).json({ error: 'Respuesta inválida del proveedor de IA' });
         }
 
-        const textoRespuesta = resultado.data[0].text;
+        // Extraer el texto generado, parsearlo a JSON y enviarlo al frontend
+        const textoRespuesta = resultado.candidates[0].content.parts[0].text;
         const jsonLimpio = JSON.parse(textoRespuesta);
         
         return res.status(200).json(jsonLimpio);
