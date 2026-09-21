@@ -30,10 +30,15 @@ export default async function handler(req, res) {
         }
 
         const promptJurado = `
-        Actúa como un Árbitro Internacional experto en ${disciplina || 'taekwondo'}.
+       Actúa como un Árbitro Internacional experto en ${disciplina || 'taekwondo'} y Especialista en Biomecánica Deportiva.
         MATRIZ IDEAL: ${JSON.stringify(matrizPerfecta)}
         DATOS DEL ALUMNO: ${JSON.stringify(datosAlumno)}
-        Compara ambos datos y devuelve la evaluación estricta.
+        
+        Analiza las diferencias geométricas y de tiempos. Genera un informe técnico detallado que incluya:
+        1. Puntaje final sobre 10.0.
+        2. Un resumen general sobre el nivel de energía, ritmo y postura.
+        3. Los errores específicos por paso, explicando la razón técnica de la pérdida de puntos (ej. "Ángulo de rodilla a 120° en lugar de 90° resta estabilidad").
+        4. Un plan de mejora con consejos tácticos y ejercicios físicos recomendados (ej. "Sentadillas isométricas para fortalecer el Dwit Kubi").
         `;
 
         // Endpoint oficial de Google Gemini (usamos 1.5-flash por su alta velocidad de respuesta)
