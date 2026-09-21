@@ -192,6 +192,53 @@
             clear: both;
             display: table;
         }
+
+        /* Estilos de la Pantalla 5 */
+        .report-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        .report-section h3 {
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        .report-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed #333;
+        }
+        .report-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: transparent;
+            border: 6px solid var(--accent-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0 auto 2rem auto;
+            color: #fff;
+        }
+
+        /* Estilos específicos para la exportación a PDF (Control+P) */
+        @media print {
+            body { background-color: #fff; color: #000; }
+            .screen { display: block; max-width: 100%; padding: 0; }
+            .no-print { display: none !important; }
+            .report-section { background-color: #fff; border: 1px solid #ccc; break-inside: avoid; }
+            .report-section h3 { color: #000; border-bottom: 2px solid #000; }
+            .score-circle { border-color: #000; color: #000; }
+            .logo-title span { color: #000; }
+        }
     </style>
 </head>
 <body>
@@ -293,6 +340,38 @@
                 <button id="btn-repeat" class="btn-back" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REPETIR</button>
                 <button id="btn-evaluate" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">CALIFICAR</button>
             </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 5: INFORME TÉCNICO DETALLADO -->
+    <div id="screen-5" class="screen">
+        <h1 class="logo-title">Dojo<span>kan</span></h1>
+        <p class="subtitle">Informe Técnico de Evaluación</p>
+
+        <div class="score-circle" id="report-score">0.0</div>
+
+        <div class="report-section">
+            <h3>Diagnóstico General</h3>
+            <p id="report-summary" style="line-height: 1.6; color: var(--text-muted);"></p>
+        </div>
+
+        <div class="report-section">
+            <h3>Análisis de Errores y Deducciones</h3>
+            <div id="report-errors">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3>Plan de Mejora y Acondicionamiento</h3>
+            <div id="report-plan">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div class="grid-options no-print">
+            <button class="btn-back" onclick="goToScreen('screen-3')" style="float:none; width:100%; margin:0;">EVALUAR OTRO ALUMNO</button>
+            <button class="btn-primary" onclick="window.print()" style="width:100%; margin:0;">DESCARGAR PDF / IMPRIMIR</button>
         </div>
     </div>
 
@@ -469,19 +548,19 @@
         });
 
         // ==========================================
-        // CONEXIÓN CON VERCEL API Y RUNWARE
+        // CONEXIÓN CON VERCEL API Y GENERACIÓN DE REPORTE
         // ==========================================
         evaluateBtn.addEventListener('click', async () => {
-            statusOverlay.innerHTML = '🧠 ENVIANDO A IA...';
+            statusOverlay.innerHTML = '🧠 ANALIZANDO BIOMECÁNICA...';
             statusOverlay.style.background = 'rgba(0, 0, 255, 0.4)';
             
             try {
-                // 1. Leer el JSON estático local (Asegúrate de que la carpeta "datos/taekwondo/" y el archivo existan)
+                // 1. Leer el JSON estático local 
                 const respuestaMatriz = await fetch(`./datos/taekwondo/${activePoomsaeFile}.json`);
                 if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
                 const matrizPerfecta = await respuestaMatriz.json();
                 
-                // 2. Simulación de los datos del alumno (Aquí irán las coordenadas recopiladas en grabación)
+                // 2. Simulación de los datos del alumno 
                 const datosGrabados = { duracion: 42, pasos_registrados: [] }; 
             
                 // 3. Enviar paquete al endpoint de Vercel
@@ -499,18 +578,48 @@
                     throw new Error('El servidor respondió con un error.');
                 }
 
-                // 4. Mostrar Resultados
-                const calificacion = await respuestaApi.json();
+                // 4. Mostrar Resultados en Pantalla 5
+                const reporte = await respuestaApi.json();
                 
-                let textoObservaciones = "Ninguna";
-                if (calificacion.observaciones && calificacion.observaciones.length > 0) {
-                    textoObservaciones = calificacion.observaciones[0].detalle;
+                // Inyectar datos generales
+                document.getElementById('report-score').innerText = reporte.puntaje_final.toFixed(1);
+                document.getElementById('report-summary').innerText = reporte.resumen_general;
+
+                // Inyectar Errores
+                const errorsContainer = document.getElementById('report-errors');
+                errorsContainer.innerHTML = '';
+                if(!reporte.errores_y_deducciones || reporte.errores_y_deducciones.length === 0) {
+                    errorsContainer.innerHTML = '<p>Ejecución perfecta, sin deducciones técnicas destacables.</p>';
+                } else {
+                    reporte.errores_y_deducciones.forEach(err => {
+                        errorsContainer.innerHTML += `
+                            <div class="report-item">
+                                <strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong>
+                                <p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion}</p>
+                            </div>
+                        `;
+                    });
                 }
-                
-                alert(`Puntaje Final: ${calificacion.puntaje_final}\n\nObservación principal: ${textoObservaciones}`);
-                
-                statusOverlay.innerHTML = '✅ EVALUACIÓN FINALIZADA';
-                statusOverlay.style.background = 'rgba(0, 255, 0, 0.4)';
+
+                // Inyectar Plan de Mejora
+                const planContainer = document.getElementById('report-plan');
+                planContainer.innerHTML = '';
+                if(!reporte.plan_mejora || reporte.plan_mejora.length === 0) {
+                    planContainer.innerHTML = '<p>Continúa practicando con normalidad.</p>';
+                } else {
+                    reporte.plan_mejora.forEach(plan => {
+                        planContainer.innerHTML += `
+                            <div class="report-item">
+                                <strong style="color: #4caf50;">Objetivo: ${plan.objetivo_tecnico}</strong>
+                                <p style="margin-top: 5px; font-size: 0.95rem;">🤸 Ejercicio: ${plan.ejercicio_recomendado}</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Limpiar cámara y transicionar a Pantalla 5
+                stopCamera();
+                goToScreen('screen-5');
 
             } catch (error) {
                 console.error(error);
