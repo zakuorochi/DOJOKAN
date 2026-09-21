@@ -1,7 +1,6 @@
 // api/jurado.js
 
 export default async function handler(req, res) {
-    // Permitir CORS básico por seguridad
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -16,33 +15,41 @@ export default async function handler(req, res) {
 
     try {
         const { matrizPerfecta, datosAlumno, disciplina } = req.body || {};
-        
-        // Volvemos a usar la variable de entorno de Google
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
         if (!GEMINI_API_KEY) {
-            console.error("Falta la variable de entorno GEMINI_API_KEY");
-            return res.status(500).json({ error: 'Configuración de servidor incompleta (API Key ausente).' });
+            return res.status(500).json({ error: 'API Key ausente en la configuración del servidor.' });
         }
 
         if (!matrizPerfecta || !datosAlumno) {
-            return res.status(400).json({ error: 'Faltan datos requeridos (matrizPerfecta o datosAlumno).' });
+            return res.status(400).json({ error: 'Faltan datos requeridos.' });
+        }
+
+        // FILTRO DE "NO HICE NADA" (Evita llamadas innecesarias a la IA)
+        if (!datosAlumno.pasos_registrados || datosAlumno.pasos_registrados.length === 0) {
+            return res.status(200).json({
+                puntaje_final: 0.0,
+                resumen_general: "(NO CALIFICABLE). No se detectaron movimientos válidos del usuario en la cámara. Por favor, asegúrate de realizar la forma completa frente al tótem.",
+                errores_y_deducciones: [],
+                plan_mejora: []
+            });
         }
 
         const promptJurado = `
-       Actúa como un Árbitro Internacional experto en ${disciplina || 'taekwondo'} y Especialista en Biomecánica Deportiva.
+        Actúa como un Árbitro Internacional experto en ${disciplina || 'taekwondo'} y Especialista en Biomecánica.
         MATRIZ IDEAL: ${JSON.stringify(matrizPerfecta)}
         DATOS DEL ALUMNO: ${JSON.stringify(datosAlumno)}
         
-        Analiza las diferencias geométricas y de tiempos. Genera un informe técnico detallado que incluya:
-        1. Puntaje final sobre 10.0.
-        2. Un resumen general sobre el nivel de energía, ritmo y postura.
-        3. Los errores específicos por paso, explicando la razón técnica de la pérdida de puntos (ej. "Ángulo de rodilla a 120° en lugar de 90° resta estabilidad").
-        4. Un plan de mejora con consejos tácticos y ejercicios físicos recomendados (ej. "Sentadillas isométricas para fortalecer el Dwit Kubi").
+        Sé implacable pero constructivo. Analiza las diferencias geométricas y de tiempos. 
+        Resta puntos por cada postura incorrecta, falta de fuerza o error de ritmo. Genera el informe técnico:
+        1. Puntaje final estricto sobre 10.0.
+        2. Resumen general de la evaluación.
+        3. Errores específicos por paso y la razón de la deducción de puntos.
+        4. Plan de mejora con ejercicios.
         `;
 
-        // Endpoint oficial de Google Gemini (usamos 1.5-flash por su alta velocidad de respuesta)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+        // URL corregida al modelo oficial de Google
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
         const respuestaGemini = await fetch(url, {
             method: "POST",
@@ -53,26 +60,38 @@ export default async function handler(req, res) {
                 contents: [{
                     parts: [{ text: promptJurado }]
                 }],
-                // Obligamos a Gemini a devolver un JSON con esta estructura exacta
                 generationConfig: {
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: "OBJECT",
                         properties: {
                             puntaje_final: { type: "NUMBER" },
-                            observaciones: {
+                            resumen_general: { type: "STRING" },
+                            errores_y_deducciones: {
                                 type: "ARRAY",
                                 items: {
                                     type: "OBJECT",
                                     properties: {
                                         paso: { type: "INTEGER" },
-                                        detalle: { type: "STRING" }
+                                        falla_tecnica: { type: "STRING" },
+                                        razon_deduccion: { type: "STRING" }
                                     },
-                                    required: ["paso", "detalle"]
+                                    required: ["paso", "falla_tecnica", "razon_deduccion"]
+                                }
+                            },
+                            plan_mejora: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        objetivo_tecnico: { type: "STRING" },
+                                        ejercicio_recomendado: { type: "STRING" }
+                                    },
+                                    required: ["objetivo_tecnico", "ejercicio_recomendado"]
                                 }
                             }
                         },
-                        required: ["puntaje_final", "observaciones"]
+                        required: ["puntaje_final", "resumen_general", "errores_y_deducciones", "plan_mejora"]
                     }
                 }
             })
@@ -80,26 +99,16 @@ export default async function handler(req, res) {
 
         const resultado = await respuestaGemini.json();
 
-        // Control de errores nativos de la API de Google
         if (resultado.error) {
-            console.error("Error devuelto por Gemini:", JSON.stringify(resultado.error));
-            return res.status(500).json({ error: 'Fallo en el motor de IA de Google', detalles: resultado.error.message });
+            return res.status(500).json({ error: 'Fallo en la IA', detalles: resultado.error.message });
         }
 
-        // Validación de que la respuesta tenga el formato esperado
-        if (!resultado.candidates || !resultado.candidates[0] || !resultado.candidates[0].content) {
-            console.error("Respuesta inesperada de Gemini:", JSON.stringify(resultado));
-            return res.status(500).json({ error: 'Respuesta inválida del proveedor de IA' });
-        }
-
-        // Extraer el texto generado, parsearlo a JSON y enviarlo al frontend
         const textoRespuesta = resultado.candidates[0].content.parts[0].text;
         const jsonLimpio = JSON.parse(textoRespuesta);
         
         return res.status(200).json(jsonLimpio);
 
     } catch (error) {
-        console.error("Excepción crítica en /api/jurado:", error.message, error.stack);
-        return res.status(500).json({ error: 'Fallo interno en el servidor', detalle: error.message });
+        return res.status(500).json({ error: 'Fallo interno', detalle: error.message });
     }
 }
