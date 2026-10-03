@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         `;
 
         // URL corregida al modelo oficial de Google
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/Gemini 3.5 Flash-Lite:generateContent?key=${GEMINI_API_KEY}`;
 
         const respuestaGemini = await fetch(url, {
             method: "POST",
