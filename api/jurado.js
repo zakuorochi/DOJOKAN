@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         if (!datosAlumno.pasos_registrados || datosAlumno.pasos_registrados.length === 0) {
             return res.status(200).json({
                 puntaje_final: 0.0,
-                resumen_general: "(NO CALIFICABLE). No se detectaron movimientos válidos del usuario en la cámara. Por favor, asegúrate de realizar la forma completa frente al tótem.",
+                resumen_general: "(NO CALIFICABLE). No se detectaron movimientos válidos del usuario en la cámara. Por favor, asegúrate de realizar la forma completa frente al dispositivo.",
                 errores_y_deducciones: [],
                 plan_mejora: []
             });
