@@ -1,444 +1,393 @@
 {
-  "poomsae_id": "Taegeuk Sam Jang (3 Jang)",
+  "poomsae_id": "Taegeuk Chil Jang (Taegeuk 7)",
   "criterios_generales_wt": {
-    "duracion_optima_segundos": 45,
+    "duracion_optima_segundos": 40,
     "tolerancia_errores_menores_grados": 10,
     "tolerancia_errores_mayores_grados": 20
   },
   "matriz_pasos": [
     {
       "paso": 1,
-      "tecnica": "Ap Seogi Arae Makki",
+      "tecnica": "Wen Sonnal Momtong Makki (left knife-hand middle block) in Dwit Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie (anchura de 1 hombro)"
+        "postura": "Dwit Kubi",
+        "angulo_rodilla_delantera": 120,
+        "angulo_rodilla_trasera": 110,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 160,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1200,
+        "tiempo_transicion_ms": 800,
         "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Apertura excesiva de la postura Ap Seogi",
-        "Extensión total del codo (bloqueo rígido en 180°)"
+        "Filo de la mano no orientado correctamente",
+        "Peso mal distribuido (debe ser 70/30)",
+        "Codo elevado por encima del hombro"
       ]
     },
     {
       "paso": 2,
-      "tecnica": "Ap Chagi + Ap Kubi Momtong Dubeon Jireugi",
+      "tecnica": "Oreun Momtong Baro Jireugi (right reverse middle punch) in Ap Kubi",
       "geometria_inferior": {
         "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
+        "angulo_codo_accion": 0,
+        "alineacion_hombro": 180
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1700,
-        "fuerza_impacto_1_a_10": 9,
+        "tiempo_transicion_ms": 450,
+        "fuerza_impacto_1_a_10": 8,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Falta de retracción (recoil) de la rodilla en el Ap Chagi",
-        "Ritmo incorrecto en el doble golpe de puño (falta de aceleración en el segundo impacto)",
-        "Talón trasero despegado al asentar Ap Kubi"
+        "Puño final no a nivel de plexo solar",
+        "Rotación incompleta de cadera",
+        "Extensión incompleta del codo"
       ]
     },
     {
       "paso": 3,
-      "tecnica": "Ap Seogi Arae Makki",
+      "tecnica": "Oreun Sonnal Momtong Makki in Dwit Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "postura": "Dwit Kubi",
+        "angulo_rodilla_delantera": 120,
+        "angulo_rodilla_trasera": 110,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 160,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1500,
+        "tiempo_transicion_ms": 700,
         "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Desequilibrio en el pivote de 180 grados sobre el metatarso (Ap Chuk)",
-        "Desalineación de la línea central en la llegada"
+        "Postura demasiado estrecha o ancha",
+        "Mano cuchillo demasiado baja o alta",
+        "Falta de tensión en el bloqueo"
       ]
     },
     {
       "paso": 4,
-      "tecnica": "Ap Chagi + Ap Kubi Momtong Dubeon Jireugi",
+      "tecnica": "Wen Momtong Baro Jireugi in Ap Kubi",
       "geometria_inferior": {
         "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
+        "angulo_codo_accion": 0,
+        "alineacion_hombro": 180
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1700,
-        "fuerza_impacto_1_a_10": 9,
+        "tiempo_transicion_ms": 450,
+        "fuerza_impacto_1_a_10": 8,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Patada por debajo de la zona abdominal/plexo solar",
-        "Inclinación posterior del tronco al patear"
+        "Hombro elevado",
+        "Punch sin snap final",
+        "Pierna trasera no extendida"
       ]
     },
     {
       "paso": 5,
-      "tecnica": "Ap Seogi Hansonnal Mok Chigi",
+      "tecnica": "Wen Batangson Momtong Makki (left palm middle block) in Ap Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
+        "postura": "Ap Kubi",
+        "angulo_rodilla_delantera": 95,
         "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 120,
-        "alineacion_hombro": 45
+        "angulo_codo_accion": 90,
+        "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1300,
-        "fuerza_impacto_1_a_10": 8,
+        "tiempo_transicion_ms": 650,
+        "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Canto de la mano (Sonnal) fuera de la altura del cuello/carótida",
-        "Palma de la mano opuesta no recogida correctamente sobre la cadera"
+        "Palma no a nivel de plexo solar",
+        "Codo despegado del cuerpo",
+        "Falta de alineación de hombros"
       ]
     },
     {
       "paso": 6,
-      "tecnica": "Ap Seogi Hansonnal Mok Chigi",
+      "tecnica": "Oreun Yeop Chagi (right side kick) + Oreun Palkup Dollyeo Chigi in Ap Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
+        "postura": "Ap Kubi",
+        "angulo_rodilla_delantera": 95,
         "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 120,
-        "alineacion_hombro": 45
+        "angulo_codo_accion": 90,
+        "alineacion_hombro": 90
       },
       "dinamica": {
         "tiempo_transicion_ms": 1100,
-        "fuerza_impacto_1_a_10": 8,
-        "khiap": false
+        "fuerza_impacto_1_a_10": 9,
+        "khiap": true
       },
       "penalizaciones_frecuentes": [
-        "Trayectoria circular del golpe descontrolada sin torque de cadera",
-        "Falta de fluidez entre ambos golpes consecutivos al cuello"
+        "Kick lateral no a altura de cara/torso",
+        "Codo no alineado con el puño en el golpe",
+        "Pérdida de equilibrio al aterrizar"
       ]
     },
     {
       "paso": 7,
-      "tecnica": "Dwit Kubi Hansonnal Momtong Bakkat Makki",
+      "tecnica": "Wen Yeop Chagi + Wen Palkup Dollyeo Chigi in Ap Kubi",
       "geometria_inferior": {
-        "postura": "Dwit Kubi",
-        "angulo_rodilla_delantera": 120,
-        "angulo_rodilla_trasera": 90,
-        "distancia_pies_relativa": "1.5 anchos de hombro (forma de L)"
+        "postura": "Ap Kubi",
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 100,
-        "alineacion_hombro": 45
+        "angulo_codo_accion": 90,
+        "alineacion_hombro": 90
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1400,
-        "fuerza_impacto_1_a_10": 8,
-        "khiap": false
+        "tiempo_transicion_ms": 1050,
+        "fuerza_impacto_1_a_10": 9,
+        "khiap": true
       },
       "penalizaciones_frecuentes": [
-        "Distribución incorrecta del peso corporal (debe ser 70% atrás, 30% adelante)",
-        "Pies no colocados en un ángulo perpendicular perfecto (90°)",
-        "Mano de apoyo inclinada o fuera del centro abdominal"
+        "Altura inconsistente del kick",
+        "Rotación de torso insuficiente",
+        "Recuperación lenta del pie de patada"
       ]
     },
     {
       "paso": 8,
-      "tecnica": "Ap Kubi Momtong Jireugi",
+      "tecnica": "Wen Sonnal Arae Makki (left knife-hand low block) in Ap Kubi",
       "geometria_inferior": {
         "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 180,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1000,
-        "fuerza_impacto_1_a_10": 8,
+        "tiempo_transicion_ms": 600,
+        "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Cambio de altura de la cadera en el paso de Dwit Kubi a Ap Kubi",
-        "Desviación de la línea central (plexo solar)"
+        "Bloqueo demasiado alto respecto a la rodilla",
+        "Filo de mano no orientado hacia abajo",
+        "Peso no transferido correctamente"
       ]
     },
     {
       "paso": 9,
-      "tecnica": "Dwit Kubi Hansonnal Momtong Bakkat Makki",
+      "tecnica": "Oreun Momtong Jireugi in Ap Kubi",
       "geometria_inferior": {
-        "postura": "Dwit Kubi",
-        "angulo_rodilla_delantera": 120,
-        "angulo_rodilla_trasera": 90,
-        "distancia_pies_relativa": "1.5 anchos de hombro (forma de L)"
+        "postura": "Ap Kubi",
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 100,
-        "alineacion_hombro": 45
+        "angulo_codo_accion": 0,
+        "alineacion_hombro": 180
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1500,
+        "tiempo_transicion_ms": 400,
         "fuerza_impacto_1_a_10": 8,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Eje del torso inclinado hacia la pierna delantera",
-        "Bloqueo con el canto de la mano por debajo de la altura de los hombros"
+        "Puño no a nivel de plexo solar",
+        "Falta de snap final",
+        "Hombro adelantado"
       ]
     },
     {
       "paso": 10,
-      "tecnica": "Ap Kubi Momtong Jireugi",
+      "tecnica": "Oreun Sonnal Arae Makki in Ap Kubi",
       "geometria_inferior": {
         "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
+        "angulo_rodilla_delantera": 95,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 180,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1000,
-        "fuerza_impacto_1_a_10": 8,
+        "tiempo_transicion_ms": 550,
+        "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Falta de rotación rápida de cadera en la transición Ap Kubi"
+        "Espacio incorrecto entre brazo y cuerpo",
+        "Muñeca flexionada",
+        "Postura Ap Kubi demasiado corta"
       ]
     },
     {
       "paso": 11,
-      "tecnica": "Ap Seogi Momtong An Makki",
+      "tecnica": "Wen Momtong Jireugi in Ap Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
+        "postura": "Ap Kubi",
+        "angulo_rodilla_delantera": 95,
         "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 90,
-        "alineacion_hombro": 0
+        "angulo_codo_accion": 0,
+        "alineacion_hombro": 180
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1300,
-        "fuerza_impacto_1_a_10": 7,
+        "tiempo_transicion_ms": 400,
+        "fuerza_impacto_1_a_10": 8,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Codo colapsado por debajo de 90 grados",
-        "Puño de bloqueo superando la línea del hombro"
+        "Rotación de cadera incompleta",
+        "Puño retraído incompleto",
+        "Mirada no frontal"
       ]
     },
     {
       "paso": 12,
-      "tecnica": "Ap Seogi Momtong An Makki",
+      "tecnica": "Wen Mureup Chigi (left knee strike) + dual hand pull in Ap Seogi",
       "geometria_inferior": {
         "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "angulo_rodilla_delantera": 100,
+        "angulo_rodilla_trasera": 170,
+        "distancia_pies_relativa": "1 ancho de hombros"
+      },
+      "geometria_superior": {
+        "angulo_codo_accion": 90,
+        "alineacion_hombro": 45
+      },
+      "dinamica": {
+        "tiempo_transicion_ms": 900,
+        "fuerza_impacto_1_a_10": 8,
+        "khiap": false
+      },
+      "penalizaciones_frecuentes": [
+        "Rodilla no elevada a altura de abdomen",
+        "Manos de tracción desalineadas",
+        "Pérdida de equilibrio"
+      ]
+    },
+    {
+      "paso": 13,
+      "tecnica": "Oreun Mureup Chigi + dual hand pull in Ap Seogi",
+      "geometria_inferior": {
+        "postura": "Ap Seogi",
+        "angulo_rodilla_delantera": 100,
+        "angulo_rodilla_trasera": 170,
+        "distancia_pies_relativa": "1 ancho de hombros"
+      },
+      "geometria_superior": {
+        "angulo_codo_accion": 90,
+        "alineacion_hombro": 45
+      },
+      "dinamica": {
+        "tiempo_transicion_ms": 850,
+        "fuerza_impacto_1_a_10": 8,
+        "khiap": false
+      },
+      "penalizaciones_frecuentes": [
+        "Altura inconsistente de la rodilla",
+        "Falta de sincronización brazos-pierna",
+        "Aterrizaje rígido"
+      ]
+    },
+    {
+      "paso": 14,
+      "tecnica": "Wen Batangson Nulleo Makki (left pressing palm block) in Dwit Kubi",
+      "geometria_inferior": {
+        "postura": "Dwit Kubi",
+        "angulo_rodilla_delantera": 120,
+        "angulo_rodilla_trasera": 110,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
         "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1100,
+        "tiempo_transicion_ms": 700,
         "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Aceleración desigual en la trayectoria circular interna del antebrazo"
-      ]
-    },
-    {
-      "paso": 13,
-      "tecnica": "Ap Seogi Arae Makki",
-      "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
-      },
-      "geometria_superior": {
-        "angulo_codo_accion": 160,
-        "alineacion_hombro": 0
-      },
-      "dinamica": {
-        "tiempo_transicion_ms": 1400,
-        "fuerza_impacto_1_a_10": 7,
-        "khiap": false
-      },
-      "penalizaciones_frecuentes": [
-        "Inestabilidad en el pivote de 270 grados",
-        "Apertura incorrecta del ángulo entre pies al caer"
-      ]
-    },
-    {
-      "paso": 14,
-      "tecnica": "Ap Chagi + Ap Kubi Momtong Dubeon Jireugi",
-      "geometria_inferior": {
-        "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
-      },
-      "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
-      },
-      "dinamica": {
-        "tiempo_transicion_ms": 1700,
-        "fuerza_impacto_1_a_10": 9,
-        "khiap": false
-      },
-      "penalizaciones_frecuentes": [
-        "Caída inestable tras la patada antes de iniciar el primer golpe de puño",
-        "Falta de alineación en el eje sagital"
+        "Palma no a nivel de plexo solar",
+        "Brazo no paralelo al suelo",
+        "Espacio incorrecto entre brazo y torso"
       ]
     },
     {
       "paso": 15,
-      "tecnica": "Ap Seogi Arae Makki",
+      "tecnica": "Oreun Batangson Nulleo Makki in Dwit Kubi",
       "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
+        "postura": "Dwit Kubi",
+        "angulo_rodilla_delantera": 120,
+        "angulo_rodilla_trasera": 110,
+        "distancia_pies_relativa": "1.5 anchos de hombros"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 160,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1500,
+        "tiempo_transicion_ms": 650,
         "fuerza_impacto_1_a_10": 7,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Giro sobre los talones destruyendo el balance dinámico"
+        "Codo elevado",
+        "Peso excesivo en pierna delantera",
+        "Falta de tensión en la presión"
       ]
     },
     {
       "paso": 16,
-      "tecnica": "Ap Chagi + Ap Kubi Momtong Dubeon Jireugi",
+      "tecnica": "Final Wen Sonnal Momtong Makki + closing to Junbi Seogi",
       "geometria_inferior": {
-        "postura": "Ap Kubi",
-        "angulo_rodilla_delantera": 90,
-        "angulo_rodilla_trasera": 180,
-        "distancia_pies_relativa": "1.5 anchos de hombro de largo"
+        "postura": "Moa Seogi",
+        "angulo_rodilla_delantera": 175,
+        "angulo_rodilla_trasera": 175,
+        "distancia_pies_relativa": "pies juntos"
       },
       "geometria_superior": {
-        "angulo_codo_accion": 180,
+        "angulo_codo_accion": 90,
         "alineacion_hombro": 0
       },
       "dinamica": {
-        "tiempo_transicion_ms": 1700,
-        "fuerza_impacto_1_a_10": 9,
+        "tiempo_transicion_ms": 1200,
+        "fuerza_impacto_1_a_10": 6,
         "khiap": false
       },
       "penalizaciones_frecuentes": [
-        "Altura insuficiente de la patada (por debajo del plexo)",
-        "Mano opuesta sin llevar al bolsillo/cadera durante los puñetazos"
-      ]
-    },
-    {
-      "paso": 17,
-      "tecnica": "Ap Seogi Arae Makki + Momtong Jireugi",
-      "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
-      },
-      "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
-      },
-      "dinamica": {
-        "tiempo_transicion_ms": 1400,
-        "fuerza_impacto_1_a_10": 8,
-        "khiap": false
-      },
-      "penalizaciones_frecuentes": [
-        "Falta de continuidad rítmica entre el bloqueo bajo y el golpe directo",
-        "Postura Ap Seogi demasiado larga"
-      ]
-    },
-    {
-      "paso": 18,
-      "tecnica": "Ap Seogi Arae Makki + Momtong Jireugi",
-      "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
-      },
-      "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
-      },
-      "dinamica": {
-        "tiempo_transicion_ms": 1300,
-        "fuerza_impacto_1_a_10": 8,
-        "khiap": false
-      },
-      "penalizaciones_frecuentes": [
-        "Descoordinación entre el impulso del paso y la llegada del bloqueo"
-      ]
-    },
-    {
-      "paso": 19,
-      "tecnica": "Ap Chagi + Ap Seogi Arae Makki + Momtong Jireugi",
-      "geometria_inferior": {
-        "postura": "Ap Seogi",
-        "angulo_rodilla_delantera": 170,
-        "angulo_rodilla_trasera": 175,
-        "distancia_pies_relativa": "1 largo de pie"
-      },
-      "geometria_superior": {
-        "angulo_codo_accion": 180,
-        "alineacion_hombro": 0
-      },
-      "dinamica": {
-        "tiempo_transicion_ms": 1600,
-        "fuerza_impacto_1_a_10": 10,
-        "khiap": true
-      },
-      "penalizaciones_frecuentes": [
-        "Falta de sincronía final entre la exhalación, el Khiap y la extensión total del puño",
-        "Pérdida de la rigidez articular en la postura final antes del llamado de Baro"
+        "Cierre de pies sin control",
+        "Falta de tensión final",
+        "Mirada no frontal al terminar"
       ]
     }
   ]
