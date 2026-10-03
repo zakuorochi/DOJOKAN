@@ -98,6 +98,13 @@
             box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
         }
 
+        .btn-primary:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
         .grid-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -278,7 +285,7 @@
         <h1 class="logo-title" style="font-size: 2.2rem;">Taekwondo <span>Poomsae</span></h1>
         <p class="subtitle">Selecciona la forma a ejecutar (Base de datos experta individual)</p>
         
-      <div class="grid-poomsae">
+        <div class="grid-poomsae">
             <div class="card-poomsae" onclick="selectPoomsae('Sa Jang', 'sa_jang')">
                 <span>Poomsae 4</span>
                 <h4>Sa Jang</h4>
@@ -306,40 +313,41 @@
         </div>
     </div>
 
-    <!-- PANTALLA 4: CÁMARA Y ESCANEO MÓVIL -->
+    <!-- PANTALLA 4: GRABACIÓN Y ANÁLISIS ASINCRÓNICO -->
     <div id="screen-4" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="goToScreen('screen-3'); stopCamera();">← Cancelar</button>
+            <button class="btn-back" onclick="goToScreen('screen-3'); resetVideo();">← Cancelar</button>
             <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
         </div>
         
-        <!-- Contenedor del visor de cámara -->
-        <div class="camera-container" style="position: relative; width: 100%; height: 60vh; background-color: #000; border: 2px solid var(--border-color); border-radius: 12px; margin: 1rem 0; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-            
-            <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 1;"></video>
-            
-            <!-- Lienzo donde MediaPipe dibuja el esqueleto -->
-            <canvas id="output_canvas" style="width: 100%; height: 100%; object-fit: cover; position: absolute; z-index: 2; pointer-events: none;"></canvas>
-            
-            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 6px; color: #fff; font-size: 0.8rem; z-index: 3; border: 1px solid var(--text-muted);">
-                🔴 Esperando posición...
-            </div>
+        <h2 style="margin-bottom: 1rem; font-size: 1.5rem;">Evaluación de Alumno</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Coloca el celular en un trípode en posición horizontal.</p>
 
-            <button id="btn-record-action" class="btn-primary" style="display: none; position: absolute; bottom: 20px; z-index: 10; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                EMPEZAR
-            </button>
+        <!-- Input oculto que invoca la cámara nativa del teléfono -->
+        <input type="file" id="video-input" accept="video/mp4,video/x-m4v,video/*" capture="environment" style="display: none;">
+
+        <div class="card-option" id="btn-open-camera" onclick="document.getElementById('video-input').click()" style="padding: 3rem 1.5rem; background-color: #1a1a1a; border-style: dashed;">
+            <h3 style="color: var(--accent-orange); font-size: 2rem;">🔴 GRABAR</h3>
+            <p>Abre la cámara y graba la forma</p>
         </div>
 
-        <!-- Contenedor de Controles Inferiores -->
-        <div id="bottom-controls" style="min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
-            <button id="btn-hold-scan" class="btn-primary" style="width: 100%; height: 80px; font-size: 1.1rem; user-select: none; touch-action: manipulation; transition: all 0.1s ease;">
-                MANTENER PARA FIJAR NODOS
-            </button>
-
-            <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between;">
-                <button id="btn-repeat" class="btn-back" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REPETIR</button>
-                <button id="btn-evaluate" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">CALIFICAR</button>
+        <!-- Contenedor del video una vez grabado (CON CANVAS SUPERPUESTO) -->
+        <div id="video-preview-container" style="display: none; margin-top: 2rem; position: relative; border-radius: 12px; overflow: hidden; border: 2px solid var(--border-color); background: #000;">
+            
+            <!-- Video real del alumno -->
+            <video id="recorded-video" playsinline style="width: 100%; max-height: 50vh; display: block;"></video>
+            
+            <!-- Lienzo mágico donde dibujaremos el esqueleto (Pointer-events:none para que no bloquee clicks) -->
+            <canvas id="output_canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
+            
+            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 6px; color: #fff; font-size: 0.9rem; z-index: 3; border: 1px solid var(--accent-orange);">
+                ✅ Video cargado
             </div>
+        </div>
+
+        <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn-back" onclick="document.getElementById('video-input').click()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REGRABAR</button>
+            <button id="btn-process-video" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">ANALIZAR Y CALIFICAR</button>
         </div>
     </div>
 
@@ -377,17 +385,7 @@
 
     <script>
         // Variables UI
-        const holdBtn = document.getElementById('btn-hold-scan');
-        const recordBtn = document.getElementById('btn-record-action');
-        const decisionDiv = document.getElementById('decision-buttons');
-        const statusOverlay = document.getElementById('status-overlay');
-        const repeatBtn = document.getElementById('btn-repeat');
-        const evaluateBtn = document.getElementById('btn-evaluate');
-        
-        let scanTimeout;
-        let isNodesLocked = false;
-        let isRecording = false;
-        let activePoomsaeFile = 'oh_jang'; // ID por defecto
+        const activePoomsaeFile = 'oh_jang'; // ID por defecto, modificado por los botones
             
         function goToScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -405,235 +403,191 @@
             }
         }
 
+        function selectPoomsae(poomsaeName, fileId = 'oh_jang') {
+            document.getElementById('current-poomsae-label').innerText = poomsaeName;
+            // Update global activePoomsaeFile
+            window.activePoomsaeFile = fileId; 
+            goToScreen('screen-4');
+        }
+
         // ==========================================
-        // INTEGRACIÓN MEDIAPIPE Y CÁMARA
+        // LÓGICA DE GRABACIÓN Y ANÁLISIS ASINCRÓNICO
         // ==========================================
-        const videoElement = document.getElementById('webcam');
+        const videoInput = document.getElementById('video-input');
+        const recordedVideo = document.getElementById('recorded-video');
+        const previewContainer = document.getElementById('video-preview-container');
+        const btnOpenCamera = document.getElementById('btn-open-camera');
+        const decisionButtons = document.getElementById('decision-buttons');
+        const btnProcessVideo = document.getElementById('btn-process-video');
         const canvasElement = document.getElementById('output_canvas');
         const canvasCtx = canvasElement.getContext('2d');
         
-        let cameraStream = null;
-        let isPipelineActive = false;
+        let datosGrabados = { duracion: 0, pasos_registrados: [] };
 
+        // Inicializamos MediaPipe
         const pose = new Pose({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
         }});
 
-        pose.setOptions({
-            modelComplexity: 1, 
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+        // Cuando el usuario termina de grabar en su cámara nativa y vuelve a la app
+        videoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const videoURL = URL.createObjectURL(file);
+            recordedVideo.src = videoURL;
+            
+            btnOpenCamera.style.display = 'none';
+            previewContainer.style.display = 'block';
+            decisionButtons.style.display = 'flex';
+            
+            document.getElementById('status-overlay').innerHTML = '✅ Video listo. Presiona analizar.';
+            document.getElementById('status-overlay').style.borderColor = 'var(--accent-orange)';
         });
 
+        function resetVideo() {
+            recordedVideo.src = '';
+            btnOpenCamera.style.display = 'flex';
+            previewContainer.style.display = 'none';
+            decisionButtons.style.display = 'none';
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        }
+
+        // Configuramos qué pasa cada vez que MediaPipe analiza un frame del video
         pose.onResults((results) => {
-            if(videoElement.videoWidth && videoElement.videoHeight) {
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
+            // 1. Guardar la matemática silenciosa para Gemini
+            if (results.poseLandmarks) {
+                datosGrabados.pasos_registrados.push({ 
+                    tiempo: recordedVideo.currentTime,
+                    nodos: results.poseLandmarks 
+                });
+            }
+
+            // 2. EL SHOW VISUAL: Dibujar el esqueleto en pantalla
+            // Ajustamos el tamaño del lienzo al tamaño real del video grabado
+            if(recordedVideo.videoWidth && recordedVideo.videoHeight) {
+                canvasElement.width = recordedVideo.videoWidth;
+                canvasElement.height = recordedVideo.videoHeight;
             }
 
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
             
+            // Si detecta un cuerpo, dibuja las líneas y puntos cibernéticos
             if (results.poseLandmarks) {
-                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 4});
-                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffffff', lineWidth: 2});
+                // Las líneas de conexión (Naranja)
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 5});
+                // Las articulaciones (Puntos Blancos)
+                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffffff', lineWidth: 2, radius: 4});
             }
             canvasCtx.restore();
         });
 
-        async function detectionLoop() {
-            if (!isPipelineActive) return;
-            if (videoElement.readyState >= 2) {
-                await pose.send({image: videoElement});
-            }
-            requestAnimationFrame(detectionLoop);
-        }
+        // El botón mágico que inicia el show
+        btnProcessVideo.addEventListener('click', async () => {
+            document.getElementById('status-overlay').innerHTML = '⚡ RASTREANDO ARTICULACIONES...';
+            document.getElementById('status-overlay').style.borderColor = '#00ff00';
+            btnProcessVideo.innerText = 'PROCESANDO...';
+            btnProcessVideo.disabled = true;
 
-        async function startCamera() {
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
-                });
-                videoElement.srcObject = cameraStream;
-                
-                videoElement.onloadedmetadata = () => {
-                    isPipelineActive = true;
-                    detectionLoop();
-                };
-            } catch (error) {
-                console.error("Error al acceder a la cámara: ", error);
-                alert("Por favor, permite el acceso a la cámara en tu navegador.");
-            }
-        }
+            datosGrabados = { duracion: 0, pasos_registrados: [] }; // Reiniciar datos
 
-        function stopCamera() {
-            isPipelineActive = false;
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                videoElement.srcObject = null;
-            }
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        }
+            // Asegurarnos de que MediaPipe use máxima precisión
+            pose.setOptions({ modelComplexity: 2, smoothLandmarks: true, minDetectionConfidence: 0.6 });
 
-        // ==========================================
-        // FLUJO DE INTERFAZ Y BOTONES
-        // ==========================================
-        function selectPoomsae(poomsaeName, fileId = 'oh_jang') {
-            document.getElementById('current-poomsae-label').innerText = poomsaeName;
-            activePoomsaeFile = fileId; 
-            goToScreen('screen-4');
-            startCamera(); 
-        }
+            // Reproducimos el video y empezamos a mandar fotogramas a la IA
+            recordedVideo.currentTime = 0; // Desde el inicio
+            recordedVideo.muted = true;
+            await recordedVideo.play();
 
-        function startScanning(e) {
-            if (isNodesLocked) return;
-            e.preventDefault();
-            holdBtn.style.backgroundColor = '#cc5500';
-            statusOverlay.innerHTML = '⚡ FIJANDO NODOS...';
-            statusOverlay.style.color = 'var(--accent-orange)';
-
-            scanTimeout = setTimeout(() => {
-                isNodesLocked = true;
-                statusOverlay.innerHTML = '🎯 NODOS FIJADOS. LISTO.';
-                statusOverlay.style.background = 'rgba(255, 107, 0, 0.2)';
-                
-                holdBtn.style.display = 'none';
-                recordBtn.style.display = 'block';
-                recordBtn.innerText = 'EMPEZAR';
-                recordBtn.style.backgroundColor = 'var(--accent-orange)';
-            }, 1200); 
-        }
-
-        function stopScanning(e) {
-            if (isNodesLocked) return;
-            e.preventDefault();
-            holdBtn.style.backgroundColor = 'var(--accent-orange)';
-            clearTimeout(scanTimeout);
-            statusOverlay.innerHTML = '🔴 Esperando posición...';
-            statusOverlay.style.color = '#fff';
-        }
-
-        recordBtn.addEventListener('click', () => {
-            if (!isRecording) {
-                isRecording = true;
-                statusOverlay.innerHTML = '⏺️ GRABANDO POOMSAE...';
-                statusOverlay.style.background = 'rgba(255, 0, 0, 0.3)';
-                statusOverlay.style.borderColor = 'red';
-                statusOverlay.style.color = 'white';
-                
-                recordBtn.innerText = 'TERMINAR';
-                recordBtn.style.backgroundColor = '#d32f2f'; 
-            } else {
-                isRecording = false;
-                statusOverlay.innerHTML = '✅ GRABACIÓN COMPLETADA';
-                statusOverlay.style.background = 'rgba(0, 255, 0, 0.2)';
-                statusOverlay.style.borderColor = 'green';
-                
-                recordBtn.style.display = 'none';
-                decisionDiv.style.display = 'flex';
-            }
-        });
-
-        repeatBtn.addEventListener('click', () => {
-            isNodesLocked = false;
-            isRecording = false;
-            
-            decisionDiv.style.display = 'none';
-            holdBtn.style.display = 'block';
-            
-            statusOverlay.innerHTML = '🔴 Esperando posición...';
-            statusOverlay.style.background = 'rgba(0,0,0,0.6)';
-            statusOverlay.style.borderColor = 'var(--text-muted)';
-        });
-
-        // ==========================================
-        // CONEXIÓN CON VERCEL API Y GENERACIÓN DE REPORTE
-        // ==========================================
-        evaluateBtn.addEventListener('click', async () => {
-            statusOverlay.innerHTML = '🧠 ANALIZANDO BIOMECÁNICA...';
-            statusOverlay.style.background = 'rgba(0, 0, 255, 0.4)';
-            
-            try {
-                // 1. Leer el JSON estático local 
-                const respuestaMatriz = await fetch(`./datos/taekwondo/${activePoomsaeFile}.json`);
-                if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
-                const matrizPerfecta = await respuestaMatriz.json();
-                
-                // 2. Simulación de los datos del alumno 
-                const datosGrabados = { duracion: 42, pasos_registrados: [] }; 
-            
-                // 3. Enviar paquete al endpoint de Vercel
-                const respuestaApi = await fetch('/api/jurado', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        disciplina: 'taekwondo',
-                        matrizPerfecta: matrizPerfecta,
-                        datosAlumno: datosGrabados
-                    })
-                });
-
-                if (!respuestaApi.ok) {
-                    throw new Error('El servidor respondió con un error.');
+            async function processFrame() {
+                if (!recordedVideo.paused && !recordedVideo.ended) {
+                    await pose.send({ image: recordedVideo });
+                    requestAnimationFrame(processFrame);
                 }
+            }
+            processFrame();
 
-                // 4. Mostrar Resultados en Pantalla 5
-                const reporte = await respuestaApi.json();
+            // Cuando el video termina de reproducirse (Termina el Show)
+            recordedVideo.onended = async () => {
+                document.getElementById('status-overlay').innerHTML = '🧠 EVALUANDO REGLAMENTO WT...';
+                document.getElementById('status-overlay').style.borderColor = 'blue';
                 
-                // Inyectar datos generales
-                document.getElementById('report-score').innerText = reporte.puntaje_final.toFixed(1);
-                document.getElementById('report-summary').innerText = reporte.resumen_general;
-
-                // Inyectar Errores
-                const errorsContainer = document.getElementById('report-errors');
-                errorsContainer.innerHTML = '';
-                if(!reporte.errores_y_deducciones || reporte.errores_y_deducciones.length === 0) {
-                    errorsContainer.innerHTML = '<p>Ejecución perfecta, sin deducciones técnicas destacables.</p>';
-                } else {
-                    reporte.errores_y_deducciones.forEach(err => {
-                        errorsContainer.innerHTML += `
-                            <div class="report-item">
-                                <strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong>
-                                <p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion}</p>
-                            </div>
-                        `;
+                try {
+                    // Cargar matriz ideal
+                    const respuestaMatriz = await fetch(`./datos/taekwondo/${window.activePoomsaeFile}.json`);
+                    if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
+                    const matrizPerfecta = await respuestaMatriz.json();
+                    
+                    // Enviar al jurado (Vercel)
+                    const respuestaApi = await fetch('/api/jurado', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            disciplina: 'taekwondo',
+                            matrizPerfecta: matrizPerfecta,
+                            datosAlumno: datosGrabados
+                        })
                     });
+
+                    if (!respuestaApi.ok) throw new Error('Error en IA');
+
+                    const reporte = await respuestaApi.json();
+                    
+                    // Llenamos la Pantalla 5
+                    document.getElementById('report-score').innerText = reporte.puntaje_final.toFixed(1);
+                    document.getElementById('report-summary').innerText = reporte.resumen_general;
+
+                    // Inyectar Errores
+                    const errorsContainer = document.getElementById('report-errors');
+                    errorsContainer.innerHTML = '';
+                    if(!reporte.errores_y_deducciones || reporte.errores_y_deducciones.length === 0) {
+                        errorsContainer.innerHTML = '<p>Ejecución perfecta, sin deducciones técnicas destacables.</p>';
+                    } else {
+                        reporte.errores_y_deducciones.forEach(err => {
+                            errorsContainer.innerHTML += `
+                                <div class="report-item">
+                                    <strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong>
+                                    <p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion}</p>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Inyectar Plan de Mejora
+                    const planContainer = document.getElementById('report-plan');
+                    planContainer.innerHTML = '';
+                    if(!reporte.plan_mejora || reporte.plan_mejora.length === 0) {
+                        planContainer.innerHTML = '<p>Continúa practicando con normalidad.</p>';
+                    } else {
+                        reporte.plan_mejora.forEach(plan => {
+                            planContainer.innerHTML += `
+                                <div class="report-item">
+                                    <strong style="color: #4caf50;">Objetivo: ${plan.objetivo_tecnico}</strong>
+                                    <p style="margin-top: 5px; font-size: 0.95rem;">🤸 Ejercicio: ${plan.ejercicio_recomendado}</p>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    // Limpiar el canvas para la próxima vez
+                    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+                    // Transición al reporte final
+                    goToScreen('screen-5');
+                    
+                    // Restaurar botón
+                    btnProcessVideo.innerText = 'ANALIZAR Y CALIFICAR';
+                    btnProcessVideo.disabled = false;
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al conectar con el servidor de evaluación.");
+                    btnProcessVideo.innerText = 'REINTENTAR';
+                    btnProcessVideo.disabled = false;
                 }
-
-                // Inyectar Plan de Mejora
-                const planContainer = document.getElementById('report-plan');
-                planContainer.innerHTML = '';
-                if(!reporte.plan_mejora || reporte.plan_mejora.length === 0) {
-                    planContainer.innerHTML = '<p>Continúa practicando con normalidad.</p>';
-                } else {
-                    reporte.plan_mejora.forEach(plan => {
-                        planContainer.innerHTML += `
-                            <div class="report-item">
-                                <strong style="color: #4caf50;">Objetivo: ${plan.objetivo_tecnico}</strong>
-                                <p style="margin-top: 5px; font-size: 0.95rem;">🤸 Ejercicio: ${plan.ejercicio_recomendado}</p>
-                            </div>
-                        `;
-                    });
-                }
-
-                // Limpiar cámara y transicionar a Pantalla 5
-                stopCamera();
-                goToScreen('screen-5');
-
-            } catch (error) {
-                console.error(error);
-                alert('Hubo un error al contactar al servidor. Verifica que /api/jurado esté desplegado y el JSON exista.');
-                statusOverlay.innerHTML = '❌ ERROR DE CONEXIÓN';
-                statusOverlay.style.background = 'rgba(255, 0, 0, 0.6)';
-            }
+            };
         });
-
-        holdBtn.addEventListener('touchstart', startScanning);
-        holdBtn.addEventListener('touchend', stopScanning);
-        holdBtn.addEventListener('mousedown', startScanning);
-        holdBtn.addEventListener('mouseup', stopScanning);
-        holdBtn.addEventListener('mouseleave', stopScanning);
     </script>
 </body>
 </html>
