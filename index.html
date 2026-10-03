@@ -323,12 +323,20 @@
         <h2 style="margin-bottom: 1rem; font-size: 1.5rem;">Evaluación de Alumno</h2>
         <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Coloca el celular en un trípode en posición horizontal.</p>
 
-        <!-- Input oculto que invoca la cámara nativa del teléfono -->
-        <input type="file" id="video-input" accept="video/mp4,video/x-m4v,video/*" capture="environment" style="display: none;">
+        <!-- Inputs ocultos: Uno para cámara y otro para galería -->
+        <input type="file" id="video-record" accept="video/mp4,video/x-m4v,video/*" capture="environment" style="display: none;">
+        <input type="file" id="video-upload" accept="video/mp4,video/x-m4v,video/*" style="display: none;">
 
-        <div class="card-option" id="btn-open-camera" onclick="document.getElementById('video-input').click()" style="padding: 3rem 1.5rem; background-color: #1a1a1a; border-style: dashed;">
-            <h3 style="color: var(--accent-orange); font-size: 2rem;">🔴 GRABAR</h3>
-            <p>Abre la cámara y graba la forma</p>
+        <!-- Opciones de captura (Grabar o Subir) -->
+        <div id="capture-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            <div class="card-option" onclick="document.getElementById('video-record').click()" style="padding: 2rem 1rem; background-color: #1a1a1a; border-style: dashed; border-color: #ff5252;">
+                <h3 style="color: #ff5252; font-size: 1.5rem;">🔴 GRABAR</h3>
+                <p style="font-size: 0.8rem;">Usar la cámara</p>
+            </div>
+            <div class="card-option" onclick="document.getElementById('video-upload').click()" style="padding: 2rem 1rem; background-color: #1a1a1a; border-style: dashed; border-color: #4caf50;">
+                <h3 style="color: #4caf50; font-size: 1.5rem;">📁 SUBIR</h3>
+                <p style="font-size: 0.8rem;">Elegir de galería</p>
+            </div>
         </div>
 
         <!-- Contenedor del video una vez grabado (CON CANVAS SUPERPUESTO) -->
@@ -346,7 +354,7 @@
         </div>
 
         <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between; margin-top: 2rem;">
-            <button class="btn-back" onclick="document.getElementById('video-input').click()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">REGRABAR</button>
+            <button class="btn-back" onclick="resetVideo()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">ELEGIR OTRO</button>
             <button id="btn-process-video" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">ANALIZAR Y CALIFICAR</button>
         </div>
     </div>
@@ -413,10 +421,11 @@
         // ==========================================
         // LÓGICA DE GRABACIÓN Y ANÁLISIS ASINCRÓNICO
         // ==========================================
-        const videoInput = document.getElementById('video-input');
+        const videoRecord = document.getElementById('video-record');
+        const videoUpload = document.getElementById('video-upload');
+        const captureOptions = document.getElementById('capture-options');
         const recordedVideo = document.getElementById('recorded-video');
         const previewContainer = document.getElementById('video-preview-container');
-        const btnOpenCamera = document.getElementById('btn-open-camera');
         const decisionButtons = document.getElementById('decision-buttons');
         const btnProcessVideo = document.getElementById('btn-process-video');
         const canvasElement = document.getElementById('output_canvas');
@@ -429,28 +438,36 @@
             return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
         }});
 
-        // Cuando el usuario termina de grabar en su cámara nativa y vuelve a la app
-        videoInput.addEventListener('change', (event) => {
+        // Función unificada para manejar el video, ya sea grabado o subido
+        function handleVideoSelection(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const videoURL = URL.createObjectURL(file);
             recordedVideo.src = videoURL;
             
-            btnOpenCamera.style.display = 'none';
+            captureOptions.style.display = 'none';
             previewContainer.style.display = 'block';
             decisionButtons.style.display = 'flex';
             
             document.getElementById('status-overlay').innerHTML = '✅ Video listo. Presiona analizar.';
             document.getElementById('status-overlay').style.borderColor = 'var(--accent-orange)';
-        });
+        }
+
+        // Asignamos la misma función a ambos botones
+        videoRecord.addEventListener('change', handleVideoSelection);
+        videoUpload.addEventListener('change', handleVideoSelection);
 
         function resetVideo() {
             recordedVideo.src = '';
-            btnOpenCamera.style.display = 'flex';
+            captureOptions.style.display = 'grid'; // Volvemos a mostrar los dos botones
             previewContainer.style.display = 'none';
             decisionButtons.style.display = 'none';
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            // Limpiamos los inputs para que permita volver a seleccionar el mismo archivo si se desea
+            videoRecord.value = '';
+            videoUpload.value = '';
         }
 
         // Configuramos qué pasa cada vez que MediaPipe analiza un frame del video
