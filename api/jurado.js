@@ -35,21 +35,28 @@ export default async function handler(req, res) {
             });
         }
 
+        // PROMPT OPTIMIZADO PARA IA SEMÁNTICA (EDGE COMPUTING)
         const promptJurado = `
         Actúa como un Árbitro Internacional experto en ${disciplina || 'taekwondo'} y Especialista en Biomecánica.
-        MATRIZ IDEAL: ${JSON.stringify(matrizPerfecta)}
-        DATOS DEL ALUMNO: ${JSON.stringify(datosAlumno)}
+        Te estoy entregando el reporte de ángulos procesado en el dispositivo del usuario.
         
-        Sé implacable pero constructivo. Analiza las diferencias geométricas y de tiempos. 
-        Resta puntos por cada postura incorrecta, falta de fuerza o error de ritmo. Genera el informe técnico:
+        MATRIZ IDEAL (Reglamento WT): ${JSON.stringify(matrizPerfecta)}
+        DATOS DEL ALUMNO (Ángulos calculados): ${JSON.stringify(datosAlumno)}
+        
+        Instrucciones de evaluación:
+        1. Compara los ángulos de las rodillas y codos del alumno con la matriz ideal.
+        2. Si la diferencia angular en una postura o técnica supera los márgenes de tolerancia de la WT (10 a 20 grados), aplica una deducción de puntos.
+        3. Sé implacable pero constructivo. 
+        
+        Genera el informe técnico final en formato JSON:
         1. Puntaje final estricto sobre 10.0.
         2. Resumen general de la evaluación.
-        3. Errores específicos por paso y la razón de la deducción de puntos.
+        3. Errores específicos por paso y la razón de la deducción de puntos (Menciona los grados de desviación si es relevante).
         4. Plan de mejora con ejercicios.
         `;
 
-        // URL corregida al modelo oficial de Google
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+        // Endpoint estable garantizado
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
         const respuestaGemini = await fetch(url, {
             method: "POST",
