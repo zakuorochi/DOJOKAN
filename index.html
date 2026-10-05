@@ -245,6 +245,7 @@
     </div>
 
     <!-- SCRIPT 2: LÓGICA DE INTELIGENCIA ARTIFICIAL -->
+<!-- SCRIPT 2: LÓGICA DE INTELIGENCIA ARTIFICIAL CON CAPTURAS -->
     <script>
         function calcularAngulo(p1, p2, p3) {
             if (!p1 || !p2 || !p3) return null;
@@ -287,14 +288,33 @@
             if (results.poseLandmarks) {
                 if (recordedVideo.currentTime - lastSavedTime >= 0.5 || lastSavedTime === 0) {
                     const nodos = results.poseLandmarks;
+                    
+                    // 1. Cálculos matemáticos
                     const angulo_rodilla_derecha = calcularAngulo(nodos[24], nodos[26], nodos[28]);
                     const angulo_rodilla_izquierda = calcularAngulo(nodos[23], nodos[25], nodos[27]);
                     const angulo_codo_derecho = calcularAngulo(nodos[12], nodos[14], nodos[16]);
 
+                    // 2. MAGIA DE CAPTURA: Creamos un lienzo temporal invisible
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = recordedVideo.videoWidth;
+                    tempCanvas.height = recordedVideo.videoHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    
+                    // Dibujamos el video real y encima el esqueleto
+                    tempCtx.drawImage(recordedVideo, 0, 0, tempCanvas.width, tempCanvas.height);
+                    drawConnectors(tempCtx, nodos, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 5});
+                    drawLandmarks(tempCtx, nodos, {color: '#ffffff', lineWidth: 2, radius: 4});
+                    
+                    // Convertimos esa fusión en una imagen ligera (Calidad 40%)
+                    const snapshot = tempCanvas.toDataURL('image/jpeg', 0.4);
+
+                    // Guardamos matemáticas y foto en la memoria
                     datosGrabados.pasos_registrados.push({ 
                         tiempo: parseFloat(recordedVideo.currentTime.toFixed(2)), 
-                        angulos: { rodilla_delantera: angulo_rodilla_derecha, rodilla_trasera: angulo_rodilla_izquierda, codo_accion: angulo_codo_derecho }
+                        angulos: { rodilla_delantera: angulo_rodilla_derecha, rodilla_trasera: angulo_rodilla_izquierda, codo_accion: angulo_codo_derecho },
+                        captura: snapshot // ¡Foto adjunta!
                     });
+                    
                     lastSavedTime = recordedVideo.currentTime;
                 }
             }
@@ -343,13 +363,21 @@
                 
                 try {
                     const respuestaMatriz = await fetch(`./datos/taekwondo/${activePoomsaeFile}.json`);
-                    if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
+                    if (!respuestaMatriz.ok) throw new Error('No se encontró el JSON del Poomsae.');
                     const matrizPerfecta = await respuestaMatriz.json();
                     
+                    // FILTRO DE SEGURIDAD: Le quitamos las fotos al JSON antes de mandarlo a la IA para no reventar Vercel
+                    const datosParaIA = {
+                        pasos_registrados: datosGrabados.pasos_registrados.map(p => ({
+                            tiempo: p.tiempo,
+                            angulos: p.angulos
+                        }))
+                    };
+
                     const respuestaApi = await fetch('/api/jurado', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ disciplina: 'taekwondo', matrizPerfecta: matrizPerfecta, datosAlumno: datosGrabados })
+                        body: JSON.stringify({ disciplina: 'taekwondo', matrizPerfecta: matrizPerfecta, datosAlumno: datosParaIA })
                     });
 
                     if (!respuestaApi.ok) throw new Error('Error en IA');
@@ -361,11 +389,33 @@
 
                     const errorsContainer = document.getElementById('report-errors');
                     errorsContainer.innerHTML = '';
+                    
                     if(!reporte.errores_y_deducciones || reporte.errores_y_deducciones.length === 0) {
                         errorsContainer.innerHTML = '<p>Ejecución perfecta, sin deducciones técnicas destacables.</p>';
                     } else {
                         reporte.errores_y_deducciones.forEach(err => {
-                            errorsContainer.innerHTML += `<div class="report-item"><strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong><p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion}</p></div>`;
+                            // MAGIA DE REVELADO: Buscamos la foto local que coincida con el tiempo del error
+                            let imagenHtml = '';
+                            if (err.tiempo_error !== undefined && datosGrabados.pasos_registrados.length > 0) {
+                                // Encuentra la captura con el tiempo más cercano
+                                const pasoCercano = datosGrabados.pasos_registrados.reduce((prev, curr) => 
+                                    Math.abs(curr.tiempo - err.tiempo_error) < Math.abs(prev.tiempo - err.tiempo_error) ? curr : prev
+                                );
+                                if (pasoCercano && pasoCercano.captura) {
+                                    imagenHtml = `<img src="${pasoCercano.captura}" style="width: 150px; border-radius: 8px; border: 2px solid #ff5252; object-fit: cover;">`;
+                                }
+                            }
+
+                            // Inyectamos el reporte con la foto al lado
+                            errorsContainer.innerHTML += `
+                                <div class="report-item" style="display: flex; gap: 1.5rem; align-items: center;">
+                                    ${imagenHtml}
+                                    <div>
+                                        <strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong>
+                                        <p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion} (Aprox. seg ${err.tiempo_error}s)</p>
+                                    </div>
+                                </div>
+                            `;
                         });
                     }
 
