@@ -254,23 +254,23 @@
     <div id="screen-1" class="screen active">
         <h1 class="logo-title">Dojo<span>kan</span></h1>
         <p class="subtitle">Sistema Inteligente de Evaluación de Formas</p>
-        <button class="btn-primary" onclick="goToScreen('screen-2')">Ingresar al Sistema</button>
+        <button class="btn-primary" onclick="window.goToScreen('screen-2')">Ingresar al Sistema</button>
     </div>
 
     <!-- PANTALLA 2: SELECCIÓN DE ARTE MARCIAL -->
     <div id="screen-2" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="goToScreen('screen-1')">← Volver</button>
+            <button class="btn-back" onclick="window.goToScreen('screen-1')">← Volver</button>
         </div>
         <h1 class="logo-title" style="font-size: 2.2rem;">Selecciona tu Disciplina</h1>
         <p class="subtitle">Escoge el arte marcial a evaluar</p>
         
         <div class="grid-options">
-            <div class="card-option" onclick="selectMartialArt('karate')">
+            <div class="card-option" onclick="window.selectMartialArt('karate')">
                 <h3>Karate-Do</h3>
                 <p>Kata oficiales (WKF)</p>
             </div>
-            <div class="card-option" onclick="selectMartialArt('taekwondo')">
+            <div class="card-option" onclick="window.selectMartialArt('taekwondo')">
                 <h3>Taekwondo</h3>
                 <p>Poomsae oficiales (WT)</p>
             </div>
@@ -280,33 +280,33 @@
     <!-- PANTALLA 3: SELECCIÓN DE POOMSAES (TAEKWONDO) -->
     <div id="screen-3" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="goToScreen('screen-2')">← Volver</button>
+            <button class="btn-back" onclick="window.goToScreen('screen-2')">← Volver</button>
         </div>
         <h1 class="logo-title" style="font-size: 2.2rem;">Taekwondo <span>Poomsae</span></h1>
         <p class="subtitle">Selecciona la forma a ejecutar (Base de datos experta individual)</p>
         
         <div class="grid-poomsae">
-            <div class="card-poomsae" onclick="selectPoomsae('Sa Jang', 'sa_jang')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Sa Jang', 'sa_jang')">
                 <span>Poomsae 4</span>
                 <h4>Sa Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Oh Jang', 'oh_jang')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Oh Jang', 'oh_jang')">
                 <span>Poomsae 5</span>
                 <h4>Oh Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Yuk Jang', 'yuk_jang')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Yuk Jang', 'yuk_jang')">
                 <span>Poomsae 6</span>
                 <h4>Yuk Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Chil Jang', 'chil_jang')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Chil Jang', 'chil_jang')">
                 <span>Poomsae 7</span>
                 <h4>Chil Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Pal Jang', 'pal_jang')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Pal Jang', 'pal_jang')">
                 <span>Poomsae 8</span>
                 <h4>Pal Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="selectPoomsae('Koryo', 'koryo')">
+            <div class="card-poomsae" onclick="window.selectPoomsae('Koryo', 'koryo')">
                 <span>Cinta Negra</span>
                 <h4>Koryo</h4>
             </div>
@@ -316,7 +316,7 @@
     <!-- PANTALLA 4: GRABACIÓN Y ANÁLISIS ASINCRÓNICO -->
     <div id="screen-4" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="goToScreen('screen-3'); resetVideo();">← Cancelar</button>
+            <button class="btn-back" onclick="window.goToScreen('screen-3'); window.resetVideo();">← Cancelar</button>
             <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
         </div>
         
@@ -340,4 +340,143 @@
         </div>
 
         <!-- Contenedor del video una vez grabado (CON CANVAS SUPERPUESTO) -->
-        <div id="video-
+        <div id="video-preview-container" style="display: none; margin-top: 2rem; position: relative; border-radius: 12px; overflow: hidden; border: 2px solid var(--border-color); background: #000;">
+            
+            <!-- Video real del alumno -->
+            <video id="recorded-video" playsinline style="width: 100%; max-height: 50vh; display: block;"></video>
+            
+            <!-- Lienzo mágico donde dibujaremos el esqueleto -->
+            <canvas id="output_canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
+            
+            <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 6px; color: #fff; font-size: 0.9rem; z-index: 3; border: 1px solid var(--accent-orange);">
+                ✅ Video cargado
+            </div>
+        </div>
+
+        <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between; margin-top: 2rem;">
+            <button class="btn-back" onclick="window.resetVideo()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">ELEGIR OTRO</button>
+            <button id="btn-process-video" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">ANALIZAR Y CALIFICAR</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 5: INFORME TÉCNICO DETALLADO -->
+    <div id="screen-5" class="screen">
+        <h1 class="logo-title">Dojo<span>kan</span></h1>
+        <p class="subtitle">Informe Técnico de Evaluación</p>
+
+        <div class="score-circle" id="report-score">0.0</div>
+
+        <div class="report-section">
+            <h3>Diagnóstico General</h3>
+            <p id="report-summary" style="line-height: 1.6; color: var(--text-muted);"></p>
+        </div>
+
+        <div class="report-section">
+            <h3>Análisis de Errores y Deducciones</h3>
+            <div id="report-errors">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h3>Plan de Mejora y Acondicionamiento</h3>
+            <div id="report-plan">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+
+        <div class="grid-options no-print">
+            <button class="btn-back" onclick="window.goToScreen('screen-3')" style="float:none; width:100%; margin:0;">EVALUAR OTRO ALUMNO</button>
+            <button class="btn-primary" onclick="window.print()" style="width:100%; margin:0;">DESCARGAR PDF / IMPRIMIR</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. FUNCIONES GLOBALES DE INTERFAZ
+        // ==========================================
+        window.activePoomsaeFile = 'oh_jang'; // ID por defecto
+            
+        window.goToScreen = function(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        };
+
+        window.selectMartialArt = function(art) {
+            if (art === 'taekwondo') {
+                window.goToScreen('screen-3');
+            } else {
+                alert('El módulo de Karate estará disponible próximamente. Ingresando a Taekwondo.');
+                window.goToScreen('screen-3');
+            }
+        };
+
+        window.selectPoomsae = function(poomsaeName, fileId) {
+            document.getElementById('current-poomsae-label').innerText = poomsaeName;
+            window.activePoomsaeFile = fileId || 'oh_jang'; 
+            window.goToScreen('screen-4');
+        };
+
+        window.resetVideo = function() {
+            document.getElementById('recorded-video').src = '';
+            document.getElementById('capture-options').style.display = 'grid';
+            document.getElementById('video-preview-container').style.display = 'none';
+            document.getElementById('decision-buttons').style.display = 'none';
+            
+            const canvasElement = document.getElementById('output_canvas');
+            const canvasCtx = canvasElement.getContext('2d');
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            document.getElementById('video-record').value = '';
+            document.getElementById('video-upload').value = '';
+        };
+
+        // ==========================================
+        // 2. FUNCIONES MATEMÁTICAS (EDGE COMPUTING)
+        // ==========================================
+        window.calcularAngulo = function(p1, p2, p3) {
+            if (!p1 || !p2 || !p3) return null;
+            let radianes = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x);
+            let angulo = Math.abs(radianes * 180.0 / Math.PI);
+            if (angulo > 180.0) {
+                angulo = 360 - angulo;
+            }
+            return Math.round(angulo);
+        };
+
+        // ==========================================
+        // 3. LÓGICA DE GRABACIÓN Y ANÁLISIS
+        // ==========================================
+        const videoRecord = document.getElementById('video-record');
+        const videoUpload = document.getElementById('video-upload');
+        const recordedVideo = document.getElementById('recorded-video');
+        const btnProcessVideo = document.getElementById('btn-process-video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        
+        let datosGrabados = { duracion: 0, pasos_registrados: [] };
+        window.lastSavedTime = 0;
+
+        function handleVideoSelection(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const videoURL = URL.createObjectURL(file);
+            recordedVideo.src = videoURL;
+            
+            document.getElementById('capture-options').style.display = 'none';
+            document.getElementById('video-preview-container').style.display = 'block';
+            document.getElementById('decision-buttons').style.display = 'flex';
+            
+            document.getElementById('status-overlay').innerHTML = '✅ Video listo. Presiona analizar.';
+            document.getElementById('status-overlay').style.borderColor = 'var(--accent-orange)';
+        }
+
+        videoRecord.addEventListener('change', handleVideoSelection);
+        videoUpload.addEventListener('change', handleVideoSelection);
+
+        // Inicializamos MediaPipe
+        const pose = new Pose({locateFile: (file) => {
+            return `
