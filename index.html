@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dojokan - Evaluador de Poomsae por IA</title>
     
-    <!-- Librerías de Google MediaPipe (Visión, Control, Dibujo y Pose) -->
+    <!-- Librerías de Google MediaPipe -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -22,221 +22,41 @@
             --border-color: #262626;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        .screen { display: none; width: 100%; max-width: 900px; padding: 2rem; text-align: center; animation: fadeIn 0.4s ease-in-out; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .logo-title { font-size: 3rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .logo-title span { color: var(--accent-orange); }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .btn-primary { background-color: var(--accent-orange); color: var(--text-main); border: none; padding: 1rem 3rem; font-size: 1.2rem; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3); }
+        .btn-primary:hover { background-color: var(--accent-orange-hover); transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5); }
+        .btn-primary:disabled { background-color: #555; cursor: not-allowed; box-shadow: none; transform: none; }
+        
+        .grid-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .card-option { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 2.5rem 1.5rem; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .card-option:hover { border-color: var(--accent-orange); transform: translateY(-4px); background-color: #1f1f1f; }
+        .card-option h3 { font-size: 1.5rem; font-weight: 600; letter-spacing: 1px; }
+        .card-option p { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
+        
+        .grid-poomsae { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+        .card-poomsae { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.8rem 1rem; cursor: pointer; transition: all 0.2s ease; }
+        .card-poomsae:hover { border-color: var(--accent-orange); background-color: rgba(255, 107, 0, 0.05); }
+        .card-poomsae h4 { font-size: 1.2rem; color: var(--text-main); }
+        .card-poomsae span { font-size: 0.8rem; color: var(--accent-orange); text-transform: uppercase; font-weight: 600; }
+        
+        .btn-back { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; margin-bottom: 2rem; font-size: 0.9rem; transition: all 0.2s; float: left; }
+        .btn-back:hover { border-color: var(--text-main); color: var(--text-main); }
+        .clearfix::after { content: ""; clear: both; display: table; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        .screen {
-            display: none;
-            width: 100%;
-            max-width: 900px;
-            padding: 2rem;
-            text-align: center;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo-title {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        .logo-title span {
-            color: var(--accent-orange);
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-orange);
-            color: var(--text-main);
-            border: none;
-            padding: 1rem 3rem;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-orange-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 107, 0, 0.5);
-        }
-
-        .btn-primary:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .grid-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .card-option {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2.5rem 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card-option:hover {
-            border-color: var(--accent-orange);
-            transform: translateY(-4px);
-            background-color: #1f1f1f;
-        }
-
-        .card-option h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .card-option p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
-
-        .grid-poomsae {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .card-poomsae {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 1.8rem 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .card-poomsae:hover {
-            border-color: var(--accent-orange);
-            background-color: rgba(255, 107, 0, 0.05);
-        }
-
-        .card-poomsae h4 {
-            font-size: 1.2rem;
-            color: var(--text-main);
-        }
-
-        .card-poomsae span {
-            font-size: 0.8rem;
-            color: var(--accent-orange);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .btn-back {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            float: left;
-        }
-
-        .btn-back:hover {
-            border-color: var(--text-main);
-            color: var(--text-main);
-        }
-
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-
-        /* Estilos de la Pantalla 5 */
-        .report-section {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: left;
-            border: 1px solid var(--border-color);
-        }
-        .report-section h3 {
-            color: var(--accent-orange);
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-        .report-item {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px dashed #333;
-        }
+        .report-section { background-color: var(--card-bg); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: left; border: 1px solid var(--border-color); }
+        .report-section h3 { color: var(--accent-orange); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .report-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #333; }
         .report-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: transparent;
-            border: 6px solid var(--accent-orange);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 800;
-            margin: 0 auto 2rem auto;
-            color: #fff;
-        }
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--accent-orange); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; margin: 0 auto 2rem auto; color: #fff; }
 
-        /* Estilos específicos para la exportación a PDF (Control+P) */
         @media print {
             body { background-color: #fff; color: #000; }
             .screen { display: block; max-width: 100%; padding: 0; }
@@ -247,6 +67,51 @@
             .logo-title span { color: #000; }
         }
     </style>
+
+    <!-- SCRIPT 1: LÓGICA DE INTERFAZ AISLADA -->
+    <script>
+        let activePoomsaeFile = 'oh_jang'; // ID por defecto
+            
+        function goToScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function selectMartialArt(art) {
+            if (art === 'taekwondo') {
+                goToScreen('screen-3');
+            } else {
+                alert('El módulo de Karate estará disponible próximamente. Ingresando a Taekwondo.');
+                goToScreen('screen-3');
+            }
+        }
+
+        function selectPoomsae(poomsaeName, fileId) {
+            document.getElementById('current-poomsae-label').innerText = poomsaeName;
+            activePoomsaeFile = fileId || 'oh_jang'; 
+            goToScreen('screen-4');
+        }
+
+        function resetVideo() {
+            const video = document.getElementById('recorded-video');
+            if(video) video.src = '';
+            
+            document.getElementById('capture-options').style.display = 'grid';
+            document.getElementById('video-preview-container').style.display = 'none';
+            document.getElementById('decision-buttons').style.display = 'none';
+            
+            document.getElementById('video-record').value = '';
+            document.getElementById('video-upload').value = '';
+            
+            const canvasElement = document.getElementById('output_canvas');
+            if(canvasElement) {
+                const canvasCtx = canvasElement.getContext('2d');
+                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -254,23 +119,23 @@
     <div id="screen-1" class="screen active">
         <h1 class="logo-title">Dojo<span>kan</span></h1>
         <p class="subtitle">Sistema Inteligente de Evaluación de Formas</p>
-        <button class="btn-primary" onclick="window.goToScreen('screen-2')">Ingresar al Sistema</button>
+        <button class="btn-primary" onclick="goToScreen('screen-2')">Ingresar al Sistema</button>
     </div>
 
     <!-- PANTALLA 2: SELECCIÓN DE ARTE MARCIAL -->
     <div id="screen-2" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="window.goToScreen('screen-1')">← Volver</button>
+            <button class="btn-back" onclick="goToScreen('screen-1')">← Volver</button>
         </div>
         <h1 class="logo-title" style="font-size: 2.2rem;">Selecciona tu Disciplina</h1>
         <p class="subtitle">Escoge el arte marcial a evaluar</p>
         
         <div class="grid-options">
-            <div class="card-option" onclick="window.selectMartialArt('karate')">
+            <div class="card-option" onclick="selectMartialArt('karate')">
                 <h3>Karate-Do</h3>
                 <p>Kata oficiales (WKF)</p>
             </div>
-            <div class="card-option" onclick="window.selectMartialArt('taekwondo')">
+            <div class="card-option" onclick="selectMartialArt('taekwondo')">
                 <h3>Taekwondo</h3>
                 <p>Poomsae oficiales (WT)</p>
             </div>
@@ -280,33 +145,33 @@
     <!-- PANTALLA 3: SELECCIÓN DE POOMSAES (TAEKWONDO) -->
     <div id="screen-3" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="window.goToScreen('screen-2')">← Volver</button>
+            <button class="btn-back" onclick="goToScreen('screen-2')">← Volver</button>
         </div>
         <h1 class="logo-title" style="font-size: 2.2rem;">Taekwondo <span>Poomsae</span></h1>
         <p class="subtitle">Selecciona la forma a ejecutar (Base de datos experta individual)</p>
         
         <div class="grid-poomsae">
-            <div class="card-poomsae" onclick="window.selectPoomsae('Sa Jang', 'sa_jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Sa Jang', 'sa_jang')">
                 <span>Poomsae 4</span>
                 <h4>Sa Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="window.selectPoomsae('Oh Jang', 'oh_jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Oh Jang', 'oh_jang')">
                 <span>Poomsae 5</span>
                 <h4>Oh Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="window.selectPoomsae('Yuk Jang', 'yuk_jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Yuk Jang', 'yuk_jang')">
                 <span>Poomsae 6</span>
                 <h4>Yuk Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="window.selectPoomsae('Chil Jang', 'chil_jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Chil Jang', 'chil_jang')">
                 <span>Poomsae 7</span>
                 <h4>Chil Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="window.selectPoomsae('Pal Jang', 'pal_jang')">
+            <div class="card-poomsae" onclick="selectPoomsae('Pal Jang', 'pal_jang')">
                 <span>Poomsae 8</span>
                 <h4>Pal Jang</h4>
             </div>
-            <div class="card-poomsae" onclick="window.selectPoomsae('Koryo', 'koryo')">
+            <div class="card-poomsae" onclick="selectPoomsae('Koryo', 'koryo')">
                 <span>Cinta Negra</span>
                 <h4>Koryo</h4>
             </div>
@@ -316,18 +181,16 @@
     <!-- PANTALLA 4: GRABACIÓN Y ANÁLISIS ASINCRÓNICO -->
     <div id="screen-4" class="screen">
         <div class="clearfix">
-            <button class="btn-back" onclick="window.goToScreen('screen-3'); window.resetVideo();">← Cancelar</button>
+            <button class="btn-back" onclick="goToScreen('screen-3'); resetVideo();">← Cancelar</button>
             <span style="float: right; color: var(--accent-orange); font-weight: bold; margin-top: 10px;" id="current-poomsae-label">Sa Jang</span>
         </div>
         
         <h2 style="margin-bottom: 1rem; font-size: 1.5rem;">Evaluación de Alumno</h2>
         <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Coloca el celular en un trípode en posición horizontal.</p>
 
-        <!-- Inputs ocultos: Uno para cámara y otro para galería -->
         <input type="file" id="video-record" accept="video/mp4,video/x-m4v,video/*" capture="environment" style="display: none;">
         <input type="file" id="video-upload" accept="video/mp4,video/x-m4v,video/*" style="display: none;">
 
-        <!-- Opciones de captura (Grabar o Subir) -->
         <div id="capture-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
             <div class="card-option" onclick="document.getElementById('video-record').click()" style="padding: 2rem 1rem; background-color: #1a1a1a; border-style: dashed; border-color: #ff5252;">
                 <h3 style="color: #ff5252; font-size: 1.5rem;">🔴 GRABAR</h3>
@@ -339,22 +202,16 @@
             </div>
         </div>
 
-        <!-- Contenedor del video una vez grabado (CON CANVAS SUPERPUESTO) -->
         <div id="video-preview-container" style="display: none; margin-top: 2rem; position: relative; border-radius: 12px; overflow: hidden; border: 2px solid var(--border-color); background: #000;">
-            
-            <!-- Video real del alumno -->
             <video id="recorded-video" playsinline style="width: 100%; max-height: 50vh; display: block;"></video>
-            
-            <!-- Lienzo mágico donde dibujaremos el esqueleto -->
             <canvas id="output_canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
-            
             <div id="status-overlay" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 6px; color: #fff; font-size: 0.9rem; z-index: 3; border: 1px solid var(--accent-orange);">
                 ✅ Video cargado
             </div>
         </div>
 
         <div id="decision-buttons" style="display: none; width: 100%; gap: 15px; justify-content: space-between; margin-top: 2rem;">
-            <button class="btn-back" onclick="window.resetVideo()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">ELEGIR OTRO</button>
+            <button class="btn-back" onclick="resetVideo()" style="flex: 1; margin: 0; height: 60px; font-size: 1rem; text-align: center;">ELEGIR OTRO</button>
             <button id="btn-process-video" class="btn-primary" style="flex: 2; margin: 0; height: 60px; font-size: 1rem;">ANALIZAR Y CALIFICAR</button>
         </div>
     </div>
@@ -373,82 +230,30 @@
 
         <div class="report-section">
             <h3>Análisis de Errores y Deducciones</h3>
-            <div id="report-errors">
-                <!-- Se llenará dinámicamente -->
-            </div>
+            <div id="report-errors"></div>
         </div>
 
         <div class="report-section">
             <h3>Plan de Mejora y Acondicionamiento</h3>
-            <div id="report-plan">
-                <!-- Se llenará dinámicamente -->
-            </div>
+            <div id="report-plan"></div>
         </div>
 
         <div class="grid-options no-print">
-            <button class="btn-back" onclick="window.goToScreen('screen-3')" style="float:none; width:100%; margin:0;">EVALUAR OTRO ALUMNO</button>
+            <button class="btn-back" onclick="goToScreen('screen-3')" style="float:none; width:100%; margin:0;">EVALUAR OTRO ALUMNO</button>
             <button class="btn-primary" onclick="window.print()" style="width:100%; margin:0;">DESCARGAR PDF / IMPRIMIR</button>
         </div>
     </div>
 
+    <!-- SCRIPT 2: LÓGICA DE INTELIGENCIA ARTIFICIAL -->
     <script>
-        // ==========================================
-        // 1. FUNCIONES GLOBALES DE INTERFAZ
-        // ==========================================
-        window.activePoomsaeFile = 'oh_jang'; // ID por defecto
-            
-        window.goToScreen = function(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-        };
-
-        window.selectMartialArt = function(art) {
-            if (art === 'taekwondo') {
-                window.goToScreen('screen-3');
-            } else {
-                alert('El módulo de Karate estará disponible próximamente. Ingresando a Taekwondo.');
-                window.goToScreen('screen-3');
-            }
-        };
-
-        window.selectPoomsae = function(poomsaeName, fileId) {
-            document.getElementById('current-poomsae-label').innerText = poomsaeName;
-            window.activePoomsaeFile = fileId || 'oh_jang'; 
-            window.goToScreen('screen-4');
-        };
-
-        window.resetVideo = function() {
-            document.getElementById('recorded-video').src = '';
-            document.getElementById('capture-options').style.display = 'grid';
-            document.getElementById('video-preview-container').style.display = 'none';
-            document.getElementById('decision-buttons').style.display = 'none';
-            
-            const canvasElement = document.getElementById('output_canvas');
-            const canvasCtx = canvasElement.getContext('2d');
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
-            document.getElementById('video-record').value = '';
-            document.getElementById('video-upload').value = '';
-        };
-
-        // ==========================================
-        // 2. FUNCIONES MATEMÁTICAS (EDGE COMPUTING)
-        // ==========================================
-        window.calcularAngulo = function(p1, p2, p3) {
+        function calcularAngulo(p1, p2, p3) {
             if (!p1 || !p2 || !p3) return null;
             let radianes = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x);
             let angulo = Math.abs(radianes * 180.0 / Math.PI);
-            if (angulo > 180.0) {
-                angulo = 360 - angulo;
-            }
+            if (angulo > 180.0) { angulo = 360 - angulo; }
             return Math.round(angulo);
-        };
+        }
 
-        // ==========================================
-        // 3. LÓGICA DE GRABACIÓN Y ANÁLISIS
-        // ==========================================
         const videoRecord = document.getElementById('video-record');
         const videoUpload = document.getElementById('video-upload');
         const recordedVideo = document.getElementById('recorded-video');
@@ -457,19 +262,16 @@
         const canvasCtx = canvasElement.getContext('2d');
         
         let datosGrabados = { duracion: 0, pasos_registrados: [] };
-        window.lastSavedTime = 0;
+        let lastSavedTime = 0;
 
         function handleVideoSelection(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const videoURL = URL.createObjectURL(file);
             recordedVideo.src = videoURL;
-            
             document.getElementById('capture-options').style.display = 'none';
             document.getElementById('video-preview-container').style.display = 'block';
             document.getElementById('decision-buttons').style.display = 'flex';
-            
             document.getElementById('status-overlay').innerHTML = '✅ Video listo. Presiona analizar.';
             document.getElementById('status-overlay').style.borderColor = 'var(--accent-orange)';
         }
@@ -477,6 +279,120 @@
         videoRecord.addEventListener('change', handleVideoSelection);
         videoUpload.addEventListener('change', handleVideoSelection);
 
-        // Inicializamos MediaPipe
         const pose = new Pose({locateFile: (file) => {
-            return `
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }});
+
+        pose.onResults((results) => {
+            if (results.poseLandmarks) {
+                if (recordedVideo.currentTime - lastSavedTime >= 0.5 || lastSavedTime === 0) {
+                    const nodos = results.poseLandmarks;
+                    const angulo_rodilla_derecha = calcularAngulo(nodos[24], nodos[26], nodos[28]);
+                    const angulo_rodilla_izquierda = calcularAngulo(nodos[23], nodos[25], nodos[27]);
+                    const angulo_codo_derecho = calcularAngulo(nodos[12], nodos[14], nodos[16]);
+
+                    datosGrabados.pasos_registrados.push({ 
+                        tiempo: parseFloat(recordedVideo.currentTime.toFixed(2)), 
+                        angulos: { rodilla_delantera: angulo_rodilla_derecha, rodilla_trasera: angulo_rodilla_izquierda, codo_accion: angulo_codo_derecho }
+                    });
+                    lastSavedTime = recordedVideo.currentTime;
+                }
+            }
+
+            if(recordedVideo.videoWidth && recordedVideo.videoHeight) {
+                canvasElement.width = recordedVideo.videoWidth;
+                canvasElement.height = recordedVideo.videoHeight;
+            }
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            if (results.poseLandmarks) {
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#ff6b00', lineWidth: 5});
+                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#ffffff', lineWidth: 2, radius: 4});
+            }
+            canvasCtx.restore();
+        });
+
+        btnProcessVideo.addEventListener('click', async () => {
+            document.getElementById('status-overlay').innerHTML = '⚡ RASTREANDO ARTICULACIONES...';
+            document.getElementById('status-overlay').style.borderColor = '#00ff00';
+            btnProcessVideo.innerText = 'PROCESANDO...';
+            btnProcessVideo.disabled = true;
+
+            datosGrabados = { duracion: 0, pasos_registrados: [] }; 
+            lastSavedTime = 0; 
+
+            pose.setOptions({ modelComplexity: 2, smoothLandmarks: true, minDetectionConfidence: 0.6 });
+
+            recordedVideo.currentTime = 0; 
+            recordedVideo.muted = true;
+            await recordedVideo.play();
+
+            async function processFrame() {
+                if (!recordedVideo.paused && !recordedVideo.ended) {
+                    await pose.send({ image: recordedVideo });
+                    requestAnimationFrame(processFrame);
+                }
+            }
+            processFrame();
+
+            recordedVideo.onended = async () => {
+                document.getElementById('status-overlay').innerHTML = '🧠 EVALUANDO REGLAMENTO WT...';
+                document.getElementById('status-overlay').style.borderColor = 'blue';
+                
+                try {
+                    const respuestaMatriz = await fetch(`./datos/taekwondo/${activePoomsaeFile}.json`);
+                    if (!respuestaMatriz.ok) throw new Error('No se encontró el archivo JSON local del Poomsae.');
+                    const matrizPerfecta = await respuestaMatriz.json();
+                    
+                    const respuestaApi = await fetch('/api/jurado', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ disciplina: 'taekwondo', matrizPerfecta: matrizPerfecta, datosAlumno: datosGrabados })
+                    });
+
+                    if (!respuestaApi.ok) throw new Error('Error en IA');
+
+                    const reporte = await respuestaApi.json();
+                    
+                    document.getElementById('report-score').innerText = reporte.puntaje_final.toFixed(1);
+                    document.getElementById('report-summary').innerText = reporte.resumen_general;
+
+                    const errorsContainer = document.getElementById('report-errors');
+                    errorsContainer.innerHTML = '';
+                    if(!reporte.errores_y_deducciones || reporte.errores_y_deducciones.length === 0) {
+                        errorsContainer.innerHTML = '<p>Ejecución perfecta, sin deducciones técnicas destacables.</p>';
+                    } else {
+                        reporte.errores_y_deducciones.forEach(err => {
+                            errorsContainer.innerHTML += `<div class="report-item"><strong style="color: #ff5252;">Paso ${err.paso}: ${err.falla_tecnica}</strong><p style="margin-top: 5px; font-size: 0.95rem;">${err.razon_deduccion}</p></div>`;
+                        });
+                    }
+
+                    const planContainer = document.getElementById('report-plan');
+                    planContainer.innerHTML = '';
+                    if(!reporte.plan_mejora || reporte.plan_mejora.length === 0) {
+                        planContainer.innerHTML = '<p>Continúa practicando con normalidad.</p>';
+                    } else {
+                        reporte.plan_mejora.forEach(plan => {
+                            planContainer.innerHTML += `<div class="report-item"><strong style="color: #4caf50;">Objetivo: ${plan.objetivo_tecnico}</strong><p style="margin-top: 5px; font-size: 0.95rem;">🤸 Ejercicio: ${plan.ejercicio_recomendado}</p></div>`;
+                        });
+                    }
+
+                    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                    goToScreen('screen-5');
+                    
+                    btnProcessVideo.innerText = 'ANALIZAR Y CALIFICAR';
+                    btnProcessVideo.disabled = false;
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al conectar con el servidor de evaluación.");
+                    btnProcessVideo.innerText = 'REINTENTAR';
+                    btnProcessVideo.disabled = false;
+                }
+            };
+        });
+    </script>
+</body>
+</html>
